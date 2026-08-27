@@ -6,7 +6,7 @@
 
 ## 1. 摘要
 
-DSH 当前是单用户、本机优先的 Web 应用。现有 `dsh-auth-gate` 能在整个页面、API 和 WebSocket 外围要求登录，但成功后只给出 allow/deny，不把稳定的人类用户身份传入 DSH API。DSH 的会话列表、工作区列表和两条实时流都是全局视图，Workspace 只表达服务器目录与 Session 归组，不包含用户或角色。
+DSH 当前是单用户、本机优先的 Web 应用，不提供本设计所需的稳定人类 principal、账户生命周期或资源授权。DSH 的会话列表、工作区列表和两条实时流都是全局视图，Workspace 只表达服务器目录与 Session 归组，不包含用户或角色。`dsh-teams` 将独立实现账户、凭据、登录会话、MFA 和授权体系，不依赖其他认证插件。
 
 本设计在不修改 DSH 的前提下提供单租户团队能力。`dsh-teams` 首先作为 Cordis Plugin 接入；若现有扩展点不能可靠接管全部数据面，则由 Plugin 拉起旁路 Web 网关和 SQLite 数据库。公开域名只访问旁路网关，原 DSH 保持 loopback-only。任何无法可靠授权的 DSH 能力默认关闭，直到能通过 Plugin/旁路覆盖，或 DSH 上游提供最小通用接缝。
 
@@ -33,8 +33,7 @@ DSH 当前是单用户、本机优先的 Web 应用。现有 `dsh-auth-gate` 能
 ## 3. 已有系统事实
 
 - Web profile 由 Cordis composition 挂载 Session、JSONL persistence、Workspace、API proxy、Web server、Client connection 和 UI 插件。
-- `dsh-auth-gate` 用户记录只有 username、passwordHash、disabled 和未启用的 totpSecret。
-- 登录会话使用随机 opaque token，数据库介质只保存 SHA-256 digest；但禁用用户不会撤销已登录会话。
+- DSH 的 Host/Origin transport trust fence 负责连接来源安全，但不提供人类账户、登录会话或资源级授权。
 - DSH SessionHeader 不包含人类用户或访问控制字段。
 - Workspace 是 canonical directory 的稳定 UUID，保存 title、timestamps 和有序 sessionIds；没有 ACL。
 - `session.list`、workspace API、mux stream 和 host stream 当前面向整个实例。
@@ -339,16 +338,16 @@ SQLite 与 DSH JSONL 不具备分布式事务，使用 operation journal + saga�
 ## 14. 迁移
 
 1. 创建 SQLite 与 schema；
-2. 关闭多人入口；
-3. 创建/确认 founder；
-4. 可选一次性导入 `dsh-auth-gate` YAML 用户，处理规范化邮箱冲突；
+2. 保持 DSH 原始入口 loopback-only，关闭多人入口；
+3. 通过 `dsh-teams` bootstrap 创建/确认 founder；
+4. 盘点现有 Workspace、Session 和 lineage，不导入任何外部账户存储；
 5. founder 成为所有现有 Workspace 的 owner；
 6. 所有现有 Session Holder 设为 founder，包括 ungrouped session；
 7. 写 migration watermark 和审计摘要；
-8. 失效全部旧 auth-gate session，要求重新登录；
+8. 将公开入口切换到 `dsh-teams`，断开现有浏览器连接并要求通过新账户系统登录；
 9. 完成授权兼容与泄漏测试后才允许创建第二个真实用户。
 
-原 YAML 归档，不双写。迁移可重入，任何部分失败都不开放多人模式。
+`dsh-teams` SQLite 是账户、凭据、登录会话和授权数据的唯一事实源，不导入或双写其他账户文件。迁移可重入，任何部分失败都不开放多人模式。
 
 ## 15. 测试策略
 
