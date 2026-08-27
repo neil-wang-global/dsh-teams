@@ -1,0 +1,23 @@
+{
+  "name": "dsh-teams",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Use DeepSeek Harness (DSH) with your team.",
+  "license": "MPL-2.0",
+  "scripts": {
+    "prepare": "lefthook install --force"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/neil-wang-global/dsh-teams.git"
+  },
+  "bugs": {
+    "url": "https://github.com/neil-wang-global/dsh-teams/issues"
+  },
+  "homepage": "https://github.com/neil-wang-global/dsh-teams#readme",
+  "devDependencies": {
+    "@commitlint/cli": "^21.2.2",
+    "@commitlint/config-conventional": "^21.2.2",
+    "lefthook": "^2.1.10"
+  }
+}

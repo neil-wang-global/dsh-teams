@@ -1,0 +1,7 @@
+{
+  "type": "github",
+  "base-branch": "main",
+  "branch-template": "feature/{issue-no}-{issue-subject}",
+  "need-worktree": true,
+  "remarks": "Automatically add the enhancement label to Issues; branch names must use short English phrases; every PR must link its Issue; PR and Issue content must not include collaborator attribution."
+}
