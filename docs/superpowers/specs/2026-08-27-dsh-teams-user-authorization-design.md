@@ -115,7 +115,7 @@ Founder admin 不可禁用、删除或降级。系统角色不直接写入登录
 - `joined_at`、`role_changed_at`；
 - 确定性 membership id，用于自动接管排序。
 
-`team_workspaces` 关联现有 DSH WorkspaceId，保存 creator_user_id 和生命周期状态。DSH 仍拥有 path、title 和 sessionIds。
+`team_workspaces` 关联现有 DSH WorkspaceId，保存 creator_user_id 与生命周期状态。`workspace_epochs` 记录每个 workspace 当前 epoch；`principal_epochs` 记录每个 user 的当前授权 epoch；`session_holders` 为每个 session 保存 `session_epoch`。`managed_workspace_roots` 保存管理员登记的 canonical realpath、stable root id、状态与审计字段；root 不得重叠或包含另一个登记 root。`managed_workspace_root_grants` 以 `(root_id, user_id)` 唯一关联 active user 和可创建目录的 root，保存 granted/revoked timestamps 与 actor。创建或采用目录时在授权事务内重新解析 realpath、校验 root active/grant active、拒绝 symlink escape、已占用目录或嵌套 root。撤销 grant 只阻止后续创建/采用，不改变该用户已创建的工作区成员身份或既有 workspace 路径；后续访问仍由 workspace membership 控制。DSH 仍拥有 path、title 和 sessionIds。
 
 ### 5.3 会话 Holder
 
@@ -128,7 +128,7 @@ Founder admin 不可禁用、删除或降级。系统角色不直接写入登录
 
 新工作区会话 Holder 是创建者。guest 不可成为 Holder。Holder 只能主动转移自己持有的会话，目标必须是该工作区 owner/member 或 system admin。Ungrouped session 只对其 Holder 与 system admin 可见，不可直接转给工作区成员；必须通过显式 attach saga 同时建立 workspace 关联和合格 Holder。
 
-Holder 被禁用、移除、降为 guest，或 system admin 降为 user 后不再具备目标工作区成员资格时，在同一 SQLite 事务中转给一个有效 owner。被降级 admin 持有的 ungrouped session 转给 founder。业务没有 owner 优先级；实现按稳定 membership id 选择第一名，确保测试和审计可重复。若无 owner，成员或角色变化失败。
+Holder 被禁用、移除、降为 guest，或 system admin 降为 user 后不再具备目标工作区成员资格时，系统先在同一 SQLite 事务中确保存在有效 owner：若待禁用用户是 sole owner，则在禁用前将 founder 设为该工作区 owner，并记录 `sole-owner-takeover` 审计事件；随后按稳定 membership id 将 Holder 会话转给有效 owner。被降级 admin 持有的 ungrouped session 转给 founder。成员移除、降级或离开在产生零 owner 时失败；禁用的 sole owner 不失败，而是遵循上述 founder 接管规则。
 
 ### 5.4 邮件与审计
 
@@ -201,15 +201,15 @@ Holder 被禁用、移除、降为 guest，或 system admin 降为 user 后不�
 
 ### 7.3 TOTP
 
-管理员开启能力后用户可自愿绑定。TOTP secret 使用外部 deployment key 进行 AES-256-GCM 加密。恢复码仅存哈希并单次消费。验证记录时间步，拒绝同一时间步重放。
+管理员开启能力后用户可自愿绑定。TOTP 与 passkey 共同参与统一第二步策略：密码验证成功后，拥有至少一个启用且可用因素的用户必须完成其中一个因素；没有可用因素的用户才可获得 password-only 正常会话。TOTP 不是单独登录方式。恢复码是一次性 TOTP 替代第二步，成功后只允许进入安全设置并要求绑定新 TOTP、选择其他因素或显式移除 TOTP；不能直接跳过到普通会话。启用、移除或替换 TOTP 必须要求当前正常 session 的 recent-auth，且移除最后一个已启用因素必须再次验证密码。管理员重置密码不删除因素，但会递增 auth_version，撤销所有会话，并要求下一次登录完成密码改密与当前第二步策略。TOTP secret 使用外部 deployment key 进行 AES-256-GCM 加密。恢复码仅存哈希并单次消费。验证记录时间步，拒绝同一时间步重放。
 
-关闭 TOTP 后禁止通过它登录或新绑定，但保留加密凭据，重新开启后恢复使用。
+关闭 TOTP 后禁止通过它登录或新绑定，但保留加密凭据；该因素在全局禁用期间不计入可用因素，用户若没有其他可用因素则按 password-only 登录。重新开启后恢复使用，并写安全审计。
 
 ### 7.4 Passkey
 
-使用维护中的 WebAuthn server/browser 实现。保存 credential id、public key、counter、backup flags、transports 和 user handle。Challenge 短期、单次、绑定 ceremony 与 session。origin 必须等于 canonical site URL，RP ID 稳定且不可从不可信 Host 推导。
+使用维护中的 WebAuthn server/browser 实现。Passkey 是统一第二步策略中的一种因素，不是绕过密码的独立登录方式；只有在未来另立需求批准 passwordless 前才可扩展。注册、删除或替换 passkey 必须要求 recent-auth；删除最后一个已启用因素必须再次验证密码。保存 credential id、public key、counter、backup flags、transports 和 user handle。Challenge 短期、单次、绑定 ceremony 与 session。origin 必须等于 canonical site URL，RP ID 稳定且不可从不可信 Host 推导。
 
-关闭 passkey 后禁止登录和新绑定但保留凭据。
+关闭 passkey 后禁止使用或新绑定但保留凭据，采用与 TOTP 相同的全局禁用、password-only 回退、重新启用与审计规则。
 
 ## 8. 权限矩阵
 
@@ -248,7 +248,9 @@ Holder 被禁用、移除、降为 guest，或 system admin 降为 user 后不�
 9. 在释放任何响应字节前重新加载当前授权状态并比较 epoch，再按当前 policy 投影；普通响应失效则丢弃结果并返回 401/403/404，download/stream 在每个 chunk/frame 前检查，失效立即 abort 上游且不再发送；
 10. 写必要审计。
 
-降权的 `suspended` 屏障阻止受影响 principal 的新读、新写、新 frame 和新 stream chunk。若授权在 DSH 调用开始前或响应释放前失效，请求拒绝；已经进入不可取消副作用的写请求由资源锁先完成，再提交降权事务。降权不能与旧权限读写或响应发送无序并发。
+降权的 `suspended` 屏障阻止受影响 principal 的新读、新写、新 frame 和新 stream chunk；已经进入不可取消副作用的写请求由资源锁先完成，再提交降权事务。
+
+`users.auth_version` 是凭据与 session epoch；`principal_epochs`、`workspace_epochs` 和每条 `session_holders.session_epoch` 是可持久化、单调递增的授权 epoch。密码重置、禁用、解禁、系统角色变化或因素要求变化在同一事务递增 principal epoch 与必要的 auth_version；成员、owner、managed-root grant、workspace 生命周期变化递增 workspace epoch，并递增受影响 principal epoch；Holder、attach/detach、session 生命周期变化递增 session epoch、workspace epoch 与受影响 principal epoch。网关或 worker 在取得授权快照、调用 DSH 前、释放响应字节/下载 chunk/stream frame 前，重新读取相关 principal + workspace + session epoch；任一不匹配即丢弃结果并中止上游。共享 SQLite 是所有 gateway/worker 的权威来源，不使用跨进程内存缓存作为 epoch 决策依据。
 
 错误规则：
 
@@ -296,6 +298,10 @@ Holder 被禁用、移除、降为 guest，或 system admin 降为 user 后不�
 - passkeys；
 - recovery_codes；
 - team_workspaces；
+- workspace_epochs；
+- principal_epochs；
+- managed_workspace_roots；
+- managed_workspace_root_grants；
 - workspace_memberships；
 - session_holders；
 - mail_outbox；
@@ -318,7 +324,7 @@ SQLite 与 DSH JSONL 不具备分布式事务，使用 operation journal + saga�
 
 所有能产生或改变资源归属的路径都必须有状态机：workspace.create/delete、session.create/fork、subagent spawn/fork、attach/detach/move、archive 和 Plugin/Remote 内部创建。由 DSH 内部 Cordis consumer 创建、旁路未发起或在崩溃窗口产生的未知 Workspace/Session 一律进入 `quarantined-unmapped`，不进入列表、搜索、导出或实时 fan-out；管理员诊断只能看到最小元数据。reconciliation 根据 lineage 让 subagent 继承父 Session 的 workspace 与 Holder，无法证明父关系时保持隔离。
 
-创建 Session 时先预分配 sessionId 和 Holder，再调用 DSH；pending 记录不出现在列表。Workspace create 在获得 DSH 返回 id 前保持 operation-only 状态，若崩溃留下未知 Workspace，由持续 reconciliation 隔离并要求补偿/认领。解散工作区先进入 deleting，阻止新写入，再解除 DSH registration 并写 tombstone。不能安全补偿的操作保持 blocked 并进入管理员诊断队列。
+创建 Session 时先预分配 sessionId 和 Holder，再调用 DSH；pending 记录不出现在列表。Workspace create 在获得 DSH 返回 id 前保持 operation-only 状态，若崩溃留下未知 Workspace，由持续 reconciliation 隔离并要求补偿/认领。解散工作区先在同一授权事务递增 workspace epoch、设置 `deleting`、suspend 该工作区关联连接并阻止新写入；随后取消或隔离运行中的 Agent/Tool 操作，终止该工作区的 download 与 stream，并将全部 retained session/attachment 和 Holder 映射转为 `quarantined-dissolved`。该状态对普通用户完全不可见，管理员只可见最小诊断元数据；恢复必须由 system admin 在显式 restore saga 中重新建立 membership、Holder、session 映射与 epochs，不能自动复活。完成后解除 DSH registration 并写 tombstone。崩溃恢复时 `deleting` 或 `quarantined-dissolved` 一律保持隔离，直到 saga 明确完成或恢复。不能安全补偿的操作保持 blocked 并进入管理员诊断队列。
 
 ## 13. 邮件设计
 
@@ -338,14 +344,14 @@ SQLite 与 DSH JSONL 不具备分布式事务，使用 operation journal + saga�
 ## 14. 迁移
 
 1. 创建 SQLite 与 schema；
-2. 保持 DSH 原始入口 loopback-only，关闭多人入口；
+2. 进入 migration maintenance：阻止 DSH 新写入，关闭现有浏览器/stream 连接，并为内部 producer 设置 quarantine；
 3. 通过 `dsh-teams` bootstrap 创建/确认 founder；
-4. 盘点现有 Workspace、Session 和 lineage，不导入任何外部账户存储；
+4. 在 maintenance watermark 下盘点现有 Workspace、Session 和 lineage，不导入任何外部账户存储；
 5. founder 成为所有现有 Workspace 的 owner；
 6. 所有现有 Session Holder 设为 founder，包括 ungrouped session；
-7. 写 migration watermark 和审计摘要；
-8. 将公开入口切换到 `dsh-teams`，断开现有浏览器连接并要求通过新账户系统登录；
-9. 完成授权兼容与泄漏测试后才允许创建第二个真实用户。
+7. 连续 reconciliation 至连续两次扫描均在同一 stable watermark，未知资源保持 quarantine；
+8. 写 migration watermark 和审计摘要；
+9. 将公开入口切换到 `dsh-teams`，仅在授权兼容与泄漏测试通过后解除 maintenance 并允许第二个真实用户。
 
 `dsh-teams` SQLite 是账户、凭据、登录会话和授权数据的唯一事实源，不导入或双写其他账户文件。迁移可重入，任何部分失败都不开放多人模式。
 
@@ -353,7 +359,7 @@ SQLite 与 DSH JSONL 不具备分布式事务，使用 operation journal + saga�
 
 ### 15.1 Policy 单元测试
 
-覆盖 system role × workspace role × holder relation × action 的笛卡尔矩阵。显式测试未知 action 默认 deny。
+覆盖 system role × workspace role × holder relation × action 的笛卡尔矩阵。显式测试未知 action 默认 deny，以及 managed root 创建/采用、root 重叠、symlink escape、grant 撤销后的既有 workspace 访问。
 
 ### 15.2 API 集成测试
 
@@ -374,17 +380,18 @@ SQLite 与 DSH JSONL 不具备分布式事务，使用 operation journal + saga�
 - founder 不变量；
 - 最后 owner 并发离开/降级；
 - guest 不可 Hold；
-- Holder 自动接管；
+- Holder 自动接管，包括 sole owner 禁用前 founder 接管；
+- principal/workspace/session epoch 递增、跨 worker 重读与响应/frame 释放竞态；
 - outbox 单次发送与 token 单次消费；
 - auth_version race。
 
 ### 15.5 恢复测试
 
-在每个 saga 阶段注入崩溃，重启 reconciliation 后不得出现未授权可见资源。验证运行期由 subagent、fork、内部 Cordis consumer 和 custom Remote 创建的未映射资源持续进入 quarantine；同时验证 DSH 不可用、SQLite busy、SMTP 超时和 Plugin reload。
+在每个 saga 阶段注入崩溃，重启 reconciliation 后不得出现未授权可见资源。验证 migration maintenance 在盘点前阻止旧连接与写入，并只在稳定 watermark 后切换。验证运行期由 subagent、fork、内部 Cordis consumer 和 custom Remote 创建的未映射资源持续进入 quarantine；验证 workspace dissolution 取消运行操作、终止 download/stream、保留资源在 `quarantined-dissolved` 且只能经显式 restore saga 恢复；同时验证 DSH 不可用、SQLite busy、SMTP 超时和 Plugin reload。
 
 ### 15.6 MFA/Passkey
 
-测试 TOTP 时间窗与重放、恢复码单次消费、WebAuthn challenge 绑定、origin/RP ID、counter 与备份标志。
+测试 password-only、单因素、双因素、全局禁用因素后的回退、TOTP 时间窗与重放、恢复码单次消费与受限会话、recent-auth 的因素注册/移除、最后因素移除、密码重置后的因素验证、WebAuthn challenge 绑定、origin/RP ID、counter 与备份标志。
 
 ### 15.7 DSH 升级与执行隔离契约
 
@@ -408,7 +415,7 @@ SQLite、migration、bootstrap、登录、管理员账户、强制改密、设�
 
 成员管理、owner/member/guest、Holder 创建/转移/自动接管、ungrouped/quarantine、离开/解散流程及 Client UI。
 
-唯一的 **Multi-user Enablement Gate** 位于 Phase 3 末：Phase 1-3 的授权、泄漏、执行隔离、线性化撤销、迁移/恢复、TLS/origin/Cookie、持久限流、本地秘密和备份检查必须全部通过，才能创建或启用第二个真实用户。其他章节提到“第二用户”时均引用此门槛，不另设较弱条件。
+唯一的 **Baseline Multi-user Enablement Gate** 位于 Phase 3 末：Phase 1-3 的密码认证、授权、泄漏、执行隔离、线性化撤销、migration/恢复、TLS/origin/Cookie、持久限流、本地秘密和备份检查必须全部通过，才能创建或启用第二个真实用户。TOTP/passkey 默认关闭，不属于 baseline gate；其他章节提到“第二用户”时均引用此门槛。
 
 ### Phase 4：增强认证
 
@@ -436,7 +443,8 @@ TOTP、恢复码、passkey、密钥轮换体验和可选的额外外网防护。
 
 ## 19. 验收门槛
 
-- 所有测试类别通过；
+- Baseline Multi-user Enablement Gate 的全部适用测试通过；
+- TOTP/passkey 保持关闭，或每个已开启因素的 Phase 4 生命周期、MFA/passkey 与生产检查测试通过；
 - compatibility manifest 与当前 DSH 完全匹配；
 - 原 DSH 仅 loopback 可达；
 - 未授权 API、附件、递归导出和 WS 测试均无泄漏；
