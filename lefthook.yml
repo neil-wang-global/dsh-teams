@@ -1,0 +1,14 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+commit-msg:
+  commands:
+    commitlint:
+      run: ./node_modules/.bin/commitlint --edit {1}
+    no-coauthor:
+      run: |
+        if grep -iE "^(co-authored-by|made with|generated with|signed-off-by):" {1}; then
+          echo "ERROR: Co-authorship information (Co-Authored-By, Made with, etc.) is not allowed in commit messages"
+          exit 1
+        fi
