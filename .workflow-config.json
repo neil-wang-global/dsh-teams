@@ -1,0 +1,7 @@
+{
+  "type": "github",
+  "base-branch": "main",
+  "branch-template": "feature/{issue-no}-{issue-subject}",
+  "need-worktree": false,
+  "remarks": ""
+}
