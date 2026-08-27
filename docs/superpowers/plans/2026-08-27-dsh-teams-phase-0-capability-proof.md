@@ -101,7 +101,7 @@ test('rejects an entry without an authorization category', () => {
 
 - [ ] **Step 2: Run the test and verify it fails**
 
-Run: `node --test packages/dsh-teams-probe/test/manifest.test.mjs`  
+Run: `node --test packages/dsh-teams-probe/test/manifest.test.mjs`
 Expected: FAIL because `manifest.mjs` does not exist.
 
 - [ ] **Step 3: Add workspace configuration and minimal parser**
@@ -160,7 +160,7 @@ export function parseManifest(input) {
 
 - [ ] **Step 4: Run the focused and workspace tests**
 
-Run: `npm ci --ignore-scripts --registry=https://registry.npmjs.org && npm run test:probe`  
+Run: `npm ci --ignore-scripts --registry=https://registry.npmjs.org && npm run test:probe`
 Expected: PASS with one test.
 
 - [ ] **Step 5: Commit**
@@ -201,7 +201,7 @@ test('rejects duplicate and unknown transport entries', () => {
 
 - [ ] **Step 2: Run the test and verify it fails**
 
-Run: `npm run test:probe`  
+Run: `npm run test:probe`
 Expected: FAIL because the initial parser accepts the unknown transport.
 
 - [ ] **Step 3: Add an explicit transport allowlist**
@@ -216,7 +216,7 @@ Create the sanitized fixture with entries for at least `session.list`, `workspac
 
 - [ ] **Step 4: Run the test and verify it passes**
 
-Run: `npm run test:probe`  
+Run: `npm run test:probe`
 Expected: PASS; fixture parses with no unknown transport.
 
 - [ ] **Step 5: Commit**
@@ -259,7 +259,7 @@ test('returns sorted relative files and package bundles', async () => {
 
 - [ ] **Step 2: Run the test and verify it fails**
 
-Run: `node --test packages/dsh-teams-probe/test/profile-scan.test.mjs`  
+Run: `node --test packages/dsh-teams-probe/test/profile-scan.test.mjs`
 Expected: FAIL because `profile-scan.mjs` does not exist.
 
 - [ ] **Step 3: Implement sorted, redacted scanning**
@@ -310,7 +310,7 @@ await writeFile(outputFile, `${JSON.stringify(await scanProfile(process.env.DSH_
 
 - [ ] **Step 4: Run tests and create the observed report**
 
-Run: `npm run test:probe && DSH_PROFILE_DIR=/path/to/disposable/profile node packages/dsh-teams-probe/src/cli.mjs scan docs/compatibility/dsh-web-current.json`  
+Run: `npm run test:probe && DSH_PROFILE_DIR=/path/to/disposable/profile node packages/dsh-teams-probe/src/cli.mjs scan docs/compatibility/dsh-web-current.json`
 Expected: PASS; report contains relative paths and bundle names only.
 
 - [ ] **Step 5: Commit**
@@ -350,7 +350,7 @@ test('fails when incremental stream traffic bypasses the adapter', () => {
 
 - [ ] **Step 2: Run the test and verify it fails**
 
-Run: `node --test packages/dsh-teams-probe/test/in-process-probe.test.mjs`  
+Run: `node --test packages/dsh-teams-probe/test/in-process-probe.test.mjs`
 Expected: FAIL because the evaluator does not exist.
 
 - [ ] **Step 3: Implement fail-closed evaluation**
@@ -417,7 +417,7 @@ test('rejects a member capability reaching another workspace', () => {
 
 - [ ] **Step 2: Run the test and verify it fails**
 
-Run: `node --test packages/dsh-teams-probe/test/execution-probe.test.mjs`  
+Run: `node --test packages/dsh-teams-probe/test/execution-probe.test.mjs`
 Expected: FAIL because the evaluator does not exist.
 
 - [ ] **Step 3: Implement isolation evaluation**
