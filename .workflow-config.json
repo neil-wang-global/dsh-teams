@@ -3,5 +3,5 @@
   "base-branch": "main",
   "branch-template": "feature/{issue-no}-{issue-subject}",
   "need-worktree": true,
-  "remarks": "Issue 自动添加 enhancement 标签；分支名必须是英文短语；PR 必须关联 Issue；PR 和 Issue 内容禁止添加协作者信息。"
+  "remarks": "Automatically add the enhancement label to Issues; branch names must use short English phrases; every PR must link its Issue; PR and Issue content must not include collaborator attribution."
 }
