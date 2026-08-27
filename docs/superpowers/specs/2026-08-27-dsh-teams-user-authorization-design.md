@@ -1,7 +1,7 @@
 # DSH Teams 单租户账户与授权设计
 
-> 日期：2026-08-27  
-> 状态：已批准设计  
+> 日期：2026-08-27
+> 状态：已批准设计
 > 关联 Issue：[GitHub #1](https://github.com/neil-wang-global/dsh-teams/issues/1)
 
 ## 1. 摘要
