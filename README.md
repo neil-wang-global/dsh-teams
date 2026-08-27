@@ -1,3 +1,3 @@
-# dsh-authing
+# dsh-teams
 
-Authing authentication plugin for DeepSeek Harness (DSH).
+Use DeepSeek Harness (DSH) with your team.
