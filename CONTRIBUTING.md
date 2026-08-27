@@ -7,7 +7,6 @@ Thank you for contributing to dsh-teams. This guide defines the required Issue, 
 - Git
 - Node.js 22.12 or later
 - npm
-- GitHub CLI (`gh`) for the Issue and pull request workflow
 
 ## Set Up the Repository
 
@@ -33,14 +32,13 @@ npm run prepare
 
 Every change must start from a GitHub Issue.
 
-- Add the `enhancement` label to a new development Issue.
 - Describe the user-facing goal, relevant constraints, and acceptance criteria.
 - Do not include collaborator attribution or generated-by information in the Issue title or body.
 - Use the project Issue workflow so the branch remains linked to the Issue.
 
 ## Create the Branch
 
-Create an isolated Git worktree for the Issue. Branch names follow this pattern:
+Create a branch for the Issue. Branch names follow this pattern:
 
 ```text
 feature/<issue-number>-<short-english-phrase>
@@ -156,10 +154,10 @@ After the pull request is merged:
 
 1. Confirm the linked Issue is closed.
 2. Return to `main` and pull the latest changes.
-3. Remove only the local branch and worktree associated with that Issue.
+3. Remove only the local branch associated with that Issue.
 4. Prune stale remote-tracking references.
 
-Do not delete branches or worktrees belonging to other Issues.
+Do not delete branches belonging to other Issues.
 
 ## License
 
