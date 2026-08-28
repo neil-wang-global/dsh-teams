@@ -11,7 +11,7 @@
     "prepare": "lefthook install --force",
     "test": "npm run test --workspaces --if-present",
     "test:probe": "npm test --workspace @dsh-teams/probe",
-    "lint:plan": "node --check packages/dsh-teams-probe/src/manifest.mjs && node --check packages/dsh-teams-probe/src/report.mjs",
+    "lint:plan": "tsc --noEmit -p packages/dsh-teams-probe/tsconfig.json",
     "check": "npm run lint:plan && npm run test:probe"
   },
   "repository": {
@@ -25,6 +25,8 @@
   "devDependencies": {
     "@commitlint/cli": "^21.2.2",
     "@commitlint/config-conventional": "^21.2.2",
-    "lefthook": "^2.1.10"
+    "@types/node": "^26.4.0",
+    "lefthook": "^2.1.10",
+    "typescript": "^7.0.2"
   }
 }

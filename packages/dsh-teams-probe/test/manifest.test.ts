@@ -5,10 +5,15 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { ACTION_CLASSIFICATIONS, parseManifest } from '../src/manifest.mjs'
-import { createCompatibilityReport } from '../src/report.mjs'
+import {
+  ACTION_CLASSIFICATIONS,
+  parseManifest,
+  type ActionClassification,
+  type ManifestEntry,
+} from '../src/manifest.ts'
+import { createCompatibilityReport } from '../src/report.ts'
 
-const classifications = [
+const classifications: ActionClassification[] = [
   'public-authenticated',
   'workspace-visible-read',
   'holder-write',
@@ -17,7 +22,11 @@ const classifications = [
   'blocked',
 ]
 
-function manifestEntry(id, classification, resourceScope = 'workspace') {
+function manifestEntry(
+  id: string,
+  classification: ActionClassification,
+  resourceScope = 'workspace',
+): ManifestEntry {
   return classification === 'blocked'
     ? { id, kind: 'route', classification }
     : { id, kind: 'route', classification, resourceScope }
@@ -105,7 +114,7 @@ test('rejects malformed manifests and unknown classifications', () => {
   assert.throws(
     () => parseManifest({
       version: 1,
-      entries: [manifestEntry('session.delete', 'allow')],
+      entries: [{ id: 'session.delete', kind: 'route', classification: 'allow' }],
     }),
     /unknown classification for session\.delete: allow/,
   )

@@ -27,7 +27,7 @@ Update root `package.json`, `package-lock.json`, and `packages/dsh-teams-probe/p
 
 ## Type System
 
-The probe package uses a local TypeScript configuration with strict checking, no emitted JavaScript, NodeNext module semantics, and TypeScript-extension imports permitted for source that Node executes directly. The root development dependencies provide `typescript`.
+The probe package uses a local TypeScript configuration with strict checking, no emitted JavaScript, NodeNext module semantics, and TypeScript-extension imports permitted for source that Node executes directly. The root development dependencies provide `typescript` and `@types/node`; the latter supplies compile-time declarations for Node's built-in test and assertion modules.
 
 The manifest module exposes typed classifications, entry shapes, manifest shapes, and parser results. The report module derives its classification groups from the typed parsed manifest. Runtime validation remains fail-closed because TypeScript types do not validate external inputs.
 
