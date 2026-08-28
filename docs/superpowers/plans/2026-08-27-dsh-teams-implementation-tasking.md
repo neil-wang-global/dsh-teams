@@ -50,6 +50,35 @@ DT-1-03 + DT-3-05 -> DT-4-01 -> DT-4-02 -> Gate C (per enabled factor)
 - **Gate B, Baseline Multi-user Enablement Gate:** Password authentication, all classified data paths, policy matrix, leak resistance, execution isolation, epochs/revocation, migration/recovery, TLS/origin/Cookie, persistent rate limiting, local secret protections, and backup recovery all pass.
 - **Gate C, Factor Production Gate:** Only applies when TOTP or passkey is enabled. The factor's lifecycle, recovery, replay, ceremony, storage, and production checks pass.
 
+## Task Status Register
+
+All tasks begin as `not-started`. Move a task to `in-progress` only after its dependencies are `complete`; use `blocked` only with a recorded external condition and owner; use `deferred` only when the referenced gate explicitly remains unaffected.
+
+| Task | Status | Dependency | Gate or release effect |
+|---|---|---|---|
+| DT-0-01 | not-started | None | Enables manifest validation. |
+| DT-0-02 | not-started | DT-0-01 | Produces the source inventory for Gate A. |
+| DT-0-03 | not-started | DT-0-02 | Proves or rejects in-process coverage. |
+| DT-0-04 | not-started | DT-0-03 | Records Gate A architecture decision. |
+| DT-1-01 | not-started | Gate A | Establishes core configuration contract. |
+| DT-1-02 | not-started | DT-1-01 | Establishes secure persistence. |
+| DT-1-03 | not-started | DT-1-02 | Establishes independent password identity. |
+| DT-1-04 | not-started | DT-1-03 | Adds audit and mail delivery semantics. |
+| DT-2-01 | not-started | DT-1-02, Gate A | Establishes policy and epochs. |
+| DT-2-02 | not-started | DT-2-01, Gate A | Enforces the selected entry boundary. |
+| DT-2-03 | not-started | DT-2-02 | Enforces stream filtering and revocation. |
+| DT-2-04 | not-started | DT-2-02, DT-2-03 | Makes deployment compatibility fail closed. |
+| DT-3-01 | not-started | DT-1-04, DT-2-04 | Adds workspace/Holder/quarantine rules. |
+| DT-3-02 | not-started | DT-3-01 | Adds saga and reconciliation safety. |
+| DT-3-03 | not-started | DT-3-02 | Adds founder migration and runbooks. |
+| DT-3-04 | not-started | DT-3-01, DT-3-03 | Adds policy-backed client UI. |
+| DT-3-05 | not-started | DT-3-04 | Supplies Gate B evidence. |
+| DT-4-01 | not-started | DT-1-03, DT-3-05 | Adds optional TOTP/recovery policy. |
+| DT-4-02 | not-started | DT-4-01 | Supplies per-factor Gate C evidence. |
+| DT-X-01 | not-started | Applicable DT task | Maintains security regression coverage. |
+| DT-X-02 | not-started | DT-1-02 to DT-3-05 | Maintains operational recovery evidence. |
+| DT-X-03 | not-started | This tasking plan | Opens implementation Issues only when ready. |
+
 ## Phase 0: Capability Discovery and Architecture Decision
 
 ### DT-0-01: Create the probe package and repeatable test harness
