@@ -4,8 +4,14 @@
   "private": true,
   "description": "Use DeepSeek Harness (DSH) with your team.",
   "license": "MPL-2.0",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "prepare": "lefthook install --force"
+    "prepare": "lefthook install --force",
+    "test": "npm run test --workspaces --if-present",
+    "test:probe": "npm test --workspace @dsh-teams/probe",
+    "check": "npm run test:probe"
   },
   "repository": {
     "type": "git",
