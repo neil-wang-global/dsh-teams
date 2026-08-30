@@ -274,6 +274,32 @@ test('fails compatibility when an expected service signature is absent from disc
   )
 })
 
+test('fails compatibility when discovery duplicates a known surface', () => {
+  const baseline = normalizeSnapshot(profile)
+  const discovered = normalizeSnapshot({
+    ...profile,
+    surfaces: [...profile.surfaces, profile.surfaces[0]],
+  })
+
+  assert.throws(
+    () => assertCompatibleSnapshot(baseline, discovered),
+    /changed discovered surface inventory/,
+  )
+})
+
+test('fails compatibility when discovery duplicates a known service', () => {
+  const baseline = normalizeSnapshot(profile)
+  const discovered = normalizeSnapshot({
+    ...profile,
+    services: [...profile.services, profile.services[0]],
+  })
+
+  assert.throws(
+    () => assertCompatibleSnapshot(baseline, discovered),
+    /changed discovered service inventory/,
+  )
+})
+
 test('fails compatibility when every remaining inventoried section drifts', () => {
   const baseline = normalizeSnapshot(profile)
   const cases: Array<[string, DshProfile]> = [

@@ -222,6 +222,9 @@ export function assertCompatibleSnapshot(
       throw new Error(`changed discovered surface: ${key}`)
     }
   }
+  if (expected.surfaces.length !== discovered.surfaces.length) {
+    throw new Error('changed discovered surface inventory')
+  }
 
   const expectedServices = new Map(expected.services.map((service) => [service.name, service.signature]))
   const discoveredServiceNames = new Set(discovered.services.map((service) => service.name))
@@ -238,5 +241,8 @@ export function assertCompatibleSnapshot(
     if (signature !== service.signature) {
       throw new Error(`changed service signature: ${service.name}`)
     }
+  }
+  if (expected.services.length !== discovered.services.length) {
+    throw new Error('changed discovered service inventory')
   }
 }
