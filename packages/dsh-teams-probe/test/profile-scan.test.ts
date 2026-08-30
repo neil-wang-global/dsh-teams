@@ -237,6 +237,126 @@ test('fails compatibility when an expected service signature is absent from disc
   )
 })
 
+test('fails compatibility when every remaining inventoried section drifts', () => {
+  const baseline = normalizeSnapshot(profile)
+  const cases: Array<[string, DshProfile]> = [
+    ['changed bundle', {
+      ...profile,
+      bundles: profile.bundles.map((bundle) =>
+        bundle.packageName === 'dsh-auth-gate' ? { ...bundle, version: '0.7.3' } : bundle,
+      ),
+    }],
+    ['added bundle', {
+      ...profile,
+      bundles: [...profile.bundles, { packageName: 'dsh-new-bundle', version: '1.0.0', usedByDshTeams: false }],
+    }],
+    ['removed bundle', {
+      ...profile,
+      bundles: profile.bundles.filter((bundle) => bundle.packageName !== 'dsh-auth-gate'),
+    }],
+    ['changed slot', {
+      ...profile,
+      slots: profile.slots.map((slot) => ({ ...slot, status: 'blocked' })),
+    }],
+    ['added slot', {
+      ...profile,
+      slots: [...profile.slots, { id: 'conversation.session.footer.actions', status: 'covered' }],
+    }],
+    ['removed slot', {
+      ...profile,
+      slots: [],
+    }],
+    ['changed resource-creating operation', {
+      ...profile,
+      resourceCreatingOperations: profile.resourceCreatingOperations.map((operation) =>
+        operation.id === 'session.create' ? { ...operation, resource: 'conversation' } : operation,
+      ),
+    }],
+    ['added resource-creating operation', {
+      ...profile,
+      resourceCreatingOperations: [
+        ...profile.resourceCreatingOperations,
+        { id: 'session.clone', resource: 'session', status: 'requires-upstream-clarification' },
+      ],
+    }],
+    ['removed resource-creating operation', {
+      ...profile,
+      resourceCreatingOperations: profile.resourceCreatingOperations.filter((operation) => operation.id !== 'session.create'),
+    }],
+    ['changed blocked introspection', {
+      ...profile,
+      introspection: [{
+        id: 'dsh.stream-carrier-introspection',
+        status: 'blocked',
+        upstreamContractCandidate: 'DSH-STREAM-CARRIER-V2-CONTRACT',
+      }],
+    }],
+    ['added blocked introspection', {
+      ...profile,
+      introspection: [{
+        id: 'dsh.stream-carrier-introspection',
+        status: 'blocked',
+        upstreamContractCandidate: 'DSH-STREAM-CARRIER-CONTRACT',
+      }, {
+        id: 'dsh.another-introspection',
+        status: 'blocked',
+        upstreamContractCandidate: 'DSH-ANOTHER-CONTRACT',
+      }],
+    }],
+    ['changed evidence', {
+      ...profile,
+      evidence: profile.evidence?.map((evidence) =>
+        evidence.source === 'source inspection' ? { ...evidence, observation: 'changed observation' } : evidence,
+      ),
+    }],
+    ['added evidence', {
+      ...profile,
+      evidence: [...(profile.evidence ?? []), {
+        source: 'new source',
+        observation: 'new observation',
+        reproduction: 'new reproduction',
+      }],
+    }],
+    ['removed evidence', {
+      ...profile,
+      evidence: profile.evidence?.filter((evidence) => evidence.source !== 'source inspection'),
+    }],
+  ]
+
+  for (const [name, discoveredProfile] of cases) {
+    assert.throws(
+      () => assertCompatibleSnapshot(baseline, normalizeSnapshot(discoveredProfile)),
+      Error,
+      name,
+    )
+  }
+})
+
+test('fails compatibility when an explicitly recorded blocked introspection entry is removed', () => {
+  const expected = normalizeSnapshot({
+    ...profile,
+    introspection: [{
+      id: 'dsh.stream-carrier-introspection',
+      status: 'blocked',
+      upstreamContractCandidate: 'DSH-STREAM-CARRIER-CONTRACT',
+    }, {
+      id: 'dsh.another-introspection',
+      status: 'blocked',
+      upstreamContractCandidate: 'DSH-ANOTHER-CONTRACT',
+    }],
+  })
+  const discovered = normalizeSnapshot({
+    ...profile,
+    introspection: [{
+      id: 'dsh.stream-carrier-introspection',
+      status: 'blocked',
+      upstreamContractCandidate: 'DSH-STREAM-CARRIER-CONTRACT',
+    }],
+  })
+
+  assert.throws(() => assertCompatibleSnapshot(expected, discovered))
+})
+
 test('reports every inventoried item under a fail-closed status', () => {
   const report = createSurfaceInventoryReport(normalizeSnapshot(profile))
 

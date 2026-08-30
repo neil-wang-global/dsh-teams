@@ -97,6 +97,34 @@ function evidenceKey(evidence: DshEvidence): string {
   return `${evidence.source}\u0000${evidence.observation}\u0000${evidence.reproduction}`
 }
 
+function assertCompatibleInventorySection<T>(
+  section: string,
+  expected: readonly T[],
+  discovered: readonly T[],
+  key: (entry: T) => string,
+): void {
+  const expectedEntries = new Map(expected.map((entry) => [key(entry), JSON.stringify(entry)]))
+  const discoveredEntries = new Map(discovered.map((entry) => [key(entry), JSON.stringify(entry)]))
+
+  for (const [entryKey, entry] of expectedEntries) {
+    const discoveredEntry = discoveredEntries.get(entryKey)
+    if (discoveredEntry === undefined) {
+      throw new Error(`missing discovered ${section}: ${entryKey}`)
+    }
+    if (discoveredEntry !== entry) {
+      throw new Error(`changed discovered ${section}: ${entryKey}`)
+    }
+  }
+  for (const entryKey of discoveredEntries.keys()) {
+    if (!expectedEntries.has(entryKey)) {
+      throw new Error(`new discovered ${section}: ${entryKey}`)
+    }
+  }
+  if (expected.length !== discovered.length) {
+    throw new Error(`changed discovered ${section} inventory`)
+  }
+}
+
 export function normalizeSnapshot(profile: DshProfile): DshSurfaceSnapshot {
   if (profile.schemaVersion !== 1) {
     throw new Error('DSH profile schema version 1 is required')
@@ -137,6 +165,27 @@ export function assertCompatibleSnapshot(
   if (expected.dshWeb.version !== discovered.dshWeb.version) {
     throw new Error(`changed DSH Web version: ${expected.dshWeb.version} -> ${discovered.dshWeb.version}`)
   }
+
+  assertCompatibleInventorySection(
+    'bundle',
+    expected.bundles,
+    discovered.bundles,
+    (bundle) => bundle.packageName,
+  )
+  assertCompatibleInventorySection('slot', expected.slots, discovered.slots, (slot) => slot.id)
+  assertCompatibleInventorySection(
+    'resource-creating operation',
+    expected.resourceCreatingOperations,
+    discovered.resourceCreatingOperations,
+    (operation) => operation.id,
+  )
+  assertCompatibleInventorySection(
+    'blocked introspection',
+    expected.introspection,
+    discovered.introspection,
+    (entry) => entry.id,
+  )
+  assertCompatibleInventorySection('evidence', expected.evidence, discovered.evidence, evidenceKey)
 
   const expectedSurfaces = new Map(expected.surfaces.map((surface) => [snapshotSurfaceKey(surface), surface]))
   const discoveredSurfaceKeys = new Set(discovered.surfaces.map(snapshotSurfaceKey))
