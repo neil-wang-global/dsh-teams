@@ -3,5 +3,10 @@
   "base-branch": "main",
   "branch-template": "feature/{issue-no}-{issue-subject}",
   "need-worktree": true,
+  "execution-strategy": "使用Superpowers的/using-superpowers技能来进行。整个这部分流程问答使用中文。",
+  "pr-draft": false,
+  "pr-auto-close-issue": true,
+  "self-reviewed": true,
+  "language": "English (Unite States)",
   "remarks": "Automatically add the enhancement label to Issues; branch names must use short English phrases; every PR must link its Issue; PR and Issue content must not include collaborator attribution."
 }
