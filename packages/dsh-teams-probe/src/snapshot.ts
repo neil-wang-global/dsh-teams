@@ -48,6 +48,12 @@ export interface IntrospectionEntry {
   upstreamContractCandidate: string
 }
 
+export interface DshEvidence {
+  source: string
+  observation: string
+  reproduction: string
+}
+
 export interface DshProfile {
   schemaVersion: 1
   dshWeb: {
@@ -60,14 +66,15 @@ export interface DshProfile {
   slots: DshSlot[]
   resourceCreatingOperations: ResourceCreatingOperation[]
   introspection?: IntrospectionEntry[]
+  evidence?: DshEvidence[]
 }
 
 export interface DshSurfaceSnapshot extends Required<DshProfile> {}
 
 const DEFAULT_INTROSPECTION: IntrospectionEntry = {
-  id: 'dsh.route-stream-introspection',
+  id: 'dsh.stream-carrier-introspection',
   status: 'blocked',
-  upstreamContractCandidate: 'DSH-ROUTE-STREAM-INTROSPECTION',
+  upstreamContractCandidate: 'DSH-STREAM-CARRIER-CONTRACT',
 }
 
 function compareBy<T>(key: (value: T) => string): (left: T, right: T) => number {
@@ -84,6 +91,10 @@ function surfaceKey(surface: DshSurface): string {
 
 function snapshotSurfaceKey(surface: DshSurfaceSnapshot['surfaces'][number]): string {
   return surfaceKey(surface)
+}
+
+function evidenceKey(evidence: DshEvidence): string {
+  return `${evidence.source}\u0000${evidence.observation}\u0000${evidence.reproduction}`
 }
 
 export function normalizeSnapshot(profile: DshProfile): DshSurfaceSnapshot {
@@ -108,6 +119,7 @@ export function normalizeSnapshot(profile: DshProfile): DshSurfaceSnapshot {
         : profile.introspection,
       (entry) => entry.id,
     ),
+    evidence: copyAndSort(profile.evidence ?? [], evidenceKey),
   }
 }
 

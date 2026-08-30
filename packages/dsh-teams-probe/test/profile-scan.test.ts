@@ -18,36 +18,72 @@ import { createSurfaceInventoryReport } from '../src/report.ts'
 
 const profile: DshProfile = {
   schemaVersion: 1,
-  dshWeb: { packageName: '@deepseek-ai/dsh-web-app', version: '0.1.0-rc.6' },
+  dshWeb: { packageName: '@deepseek-ai/dsh-web-app', version: '0.1.1-rc.2' },
   bundles: [
-    { packageName: '@deepseek-ai/dsh-auth-gate', version: '0.1.0-rc.6', usedByDshTeams: false },
-    { packageName: '@deepseek-ai/dsh-web-app', version: '0.1.0-rc.6', usedByDshTeams: true },
+    { packageName: '@deepseek-ai/dsh-base', version: '0.1.1-rc.2', usedByDshTeams: false },
+    { packageName: '@deepseek-ai/dsh-web-app', version: '0.1.1-rc.2', usedByDshTeams: true },
+    { packageName: '@linxin666/dsh-web-ui-all', version: '0.2.8', usedByDshTeams: false },
+    { packageName: 'dsh-auth-gate', version: '0.7.2', usedByDshTeams: false },
+    { packageName: 'dsh-deeptutor', version: '0.1.9', usedByDshTeams: false },
+    { packageName: 'dsh-notification', version: '0.1.3', usedByDshTeams: false },
+    { packageName: 'dsh-plugin-sandbox-escalation-fix', version: '0.1.1', usedByDshTeams: false },
+    { packageName: 'dsh-pocket', version: '2.10.0', usedByDshTeams: false },
+    { packageName: 'pomasa-studio', version: '0.1.0', usedByDshTeams: false },
   ],
   services: [
     { name: 'webServer', signature: 'register(route)|registerUpgrade(route)' },
-    { name: 'typertGateway', signature: 'invoke(request)' },
+    { name: 'apiProxy', signature: 'no physical route registration' },
   ],
   surfaces: [
-    { kind: 'rpc', id: 'session.list', status: 'covered', classification: 'workspace-visible-read' },
-    { kind: 'rpc', id: 'session.search', status: 'blocked', classification: 'blocked' },
-    { kind: 'rpc', id: 'session.export', status: 'blocked', classification: 'blocked' },
-    { kind: 'rpc', id: 'workspace.create', status: 'covered', classification: 'owner-write' },
-    { kind: 'rpc', id: 'workspace.members.list', status: 'covered', classification: 'workspace-visible-read' },
-    { kind: 'http', id: 'GET /attachments/:attachmentId', status: 'blocked', classification: 'blocked' },
-    { kind: 'http', id: 'GET /sessions/:sessionId/export', status: 'blocked', classification: 'blocked' },
-    { kind: 'http', id: 'POST /api', status: 'covered', classification: 'public-authenticated' },
-    { kind: 'websocket', id: '/events', mode: 'baseline', status: 'requires-upstream-clarification', classification: 'blocked' },
-    { kind: 'websocket', id: '/events', mode: 'incremental', status: 'requires-upstream-clarification', classification: 'blocked' },
+    { kind: 'http', id: 'GET /api/session.export', status: 'blocked', classification: 'blocked' },
+    { kind: 'http', id: 'HEAD /api/session.export', status: 'blocked', classification: 'blocked' },
+    { kind: 'http', id: 'POST /sidebar/api/:method', status: 'blocked', classification: 'blocked' },
+    { kind: 'http', id: 'GET /sidebar/file', status: 'blocked', classification: 'blocked' },
+    { kind: 'http', id: 'GET /sidebar/html', status: 'blocked', classification: 'blocked' },
+    { kind: 'http', id: 'GET /sidebar/bundle', status: 'blocked', classification: 'blocked' },
+    { kind: 'rpc', id: 'session.list', status: 'requires-upstream-clarification', classification: 'blocked' },
+    { kind: 'rpc', id: 'session.search', status: 'requires-upstream-clarification', classification: 'blocked' },
+    { kind: 'rpc', id: 'workspace.create', status: 'requires-upstream-clarification', classification: 'blocked' },
+    { kind: 'websocket', id: '/sidebar/ws/terminal', status: 'blocked', classification: 'blocked' },
+    { kind: 'websocket', id: '/sidebar/ws/agent-terminals', status: 'blocked', classification: 'blocked' },
+    {
+      kind: 'websocket',
+      id: 'unresolved DSH stream carrier',
+      mode: 'baseline',
+      status: 'requires-upstream-clarification',
+      classification: 'blocked',
+    },
+    {
+      kind: 'websocket',
+      id: 'unresolved DSH stream carrier',
+      mode: 'incremental',
+      status: 'requires-upstream-clarification',
+      classification: 'blocked',
+    },
   ],
   slots: [
-    { id: 'app.sidebar.footer', status: 'covered' },
-    { id: 'session.toolbar', status: 'requires-upstream-clarification' },
+    { id: 'conversation.session.header.utilities', status: 'covered' },
   ],
   resourceCreatingOperations: [
-    { id: 'attachment.attach', resource: 'attachment', status: 'blocked' },
-    { id: 'session.create', resource: 'session', status: 'covered' },
-    { id: 'session.fork', resource: 'session', status: 'requires-upstream-clarification' },
-    { id: 'workspace.create', resource: 'workspace', status: 'covered' },
+    { id: 'session.create', resource: 'session', status: 'requires-upstream-clarification' },
+    { id: 'workspace.create', resource: 'workspace', status: 'requires-upstream-clarification' },
+  ],
+  evidence: [
+    {
+      source: 'browser live page',
+      observation: 'Session export triggers a browser download; unauthenticated root returns 401 with no-store.',
+      reproduction: 'Open an authenticated session and export its log; request the unauthenticated root.',
+    },
+    {
+      source: 'installed package inventory',
+      observation: 'Installed DSH packages match the versioned bundle inventory.',
+      reproduction: 'Read the installed package inventory from the configured DSH profile.',
+    },
+    {
+      source: 'source inspection',
+      observation: 'webServer and apiProxy are present; apiProxy registers no physical routes.',
+      reproduction: 'Inspect DSH Web service registrations and extension declarations.',
+    },
   ],
 }
 
@@ -69,18 +105,65 @@ test('normalizes a DSH profile into stable canonical JSON', () => {
   assert.deepEqual(first, second)
   assert.equal(JSON.stringify(first), JSON.stringify(second))
   assert.deepEqual(first.introspection, [{
-    id: 'dsh.route-stream-introspection',
+    id: 'dsh.stream-carrier-introspection',
     status: 'blocked',
-    upstreamContractCandidate: 'DSH-ROUTE-STREAM-INTROSPECTION',
+    upstreamContractCandidate: 'DSH-STREAM-CARRIER-CONTRACT',
   }])
+})
+
+test('normalizes evidence into deterministic source order', () => {
+  const evidence = [
+    {
+      source: 'source-z',
+      observation: 'later observation',
+      reproduction: 'later reproduction',
+    },
+    {
+      source: 'source-a',
+      observation: 'earlier observation',
+      reproduction: 'earlier reproduction',
+    },
+  ]
+
+  const first = normalizeSnapshot({ ...profile, evidence })
+  const second = normalizeSnapshot({ ...profile, evidence: [...evidence].reverse() })
+
+  assert.deepEqual(first, second)
+  assert.deepEqual(
+    first.evidence,
+    [...evidence].reverse(),
+  )
+})
+
+test('retains live export, RPC, and unresolved stream-mode evidence', () => {
+  const surfaces = normalizeSnapshot(profile).surfaces
+
+  assert.deepEqual(
+    surfaces.map((surface) => `${surface.kind} ${surface.id}${surface.mode === undefined ? '' : ` ${surface.mode}`}`),
+    [
+      'http GET /api/session.export',
+      'http GET /sidebar/bundle',
+      'http GET /sidebar/file',
+      'http GET /sidebar/html',
+      'http HEAD /api/session.export',
+      'http POST /sidebar/api/:method',
+      'rpc session.list',
+      'rpc session.search',
+      'rpc workspace.create',
+      'websocket /sidebar/ws/agent-terminals',
+      'websocket /sidebar/ws/terminal',
+      'websocket unresolved DSH stream carrier baseline',
+      'websocket unresolved DSH stream carrier incremental',
+    ],
+  )
 })
 
 test('scans only the profile named by DSH_PROFILE_DIR', async () => {
   const profileDir = await writeProfile(profile)
   const snapshot = await scanProfile({ DSH_PROFILE_DIR: profileDir })
 
-  assert.equal(snapshot.dshWeb.version, '0.1.0-rc.6')
-  assert.equal(snapshot.bundles[0].packageName, '@deepseek-ai/dsh-auth-gate')
+  assert.equal(snapshot.dshWeb.version, '0.1.1-rc.2')
+  assert.equal(snapshot.bundles[0].packageName, '@deepseek-ai/dsh-base')
   assert.equal(snapshot.bundles[0].usedByDshTeams, false)
   await assert.rejects(
     () => scanProfile({}),
@@ -128,16 +211,16 @@ test('fails compatibility when the DSH Web version or an inventoried surface cha
   assert.throws(
     () => assertCompatibleSnapshot(baseline, normalizeSnapshot({
       ...profile,
-      dshWeb: { ...profile.dshWeb, version: '0.1.0-rc.7' },
+      dshWeb: { ...profile.dshWeb, version: '0.1.1-rc.7' },
     })),
-    /changed DSH Web version: 0\.1\.0-rc\.6 -> 0\.1\.0-rc\.7/,
+    /changed DSH Web version: 0\.1\.1-rc\.2 -> 0\.1\.1-rc\.7/,
   )
   assert.throws(
     () => assertCompatibleSnapshot(baseline, normalizeSnapshot({
       ...profile,
-      surfaces: profile.surfaces.filter((surface) => surface.id !== 'session.list'),
+      surfaces: profile.surfaces.filter((surface) => surface.id !== 'HEAD /api/session.export'),
     })),
-    /missing discovered surface: rpc session\.list/,
+    /missing discovered surface: http HEAD \/api\/session\.export/,
   )
 })
 
@@ -145,12 +228,12 @@ test('fails compatibility when an expected service signature is absent from disc
   const expected = normalizeSnapshot(profile)
   const discovered = normalizeSnapshot({
     ...profile,
-    services: profile.services.filter((service) => service.name !== 'typertGateway'),
+    services: profile.services.filter((service) => service.name !== 'apiProxy'),
   })
 
   assert.throws(
     () => assertCompatibleSnapshot(expected, discovered),
-    /missing discovered service: typertGateway/,
+    /missing discovered service: apiProxy/,
   )
 })
 
@@ -159,28 +242,28 @@ test('reports every inventoried item under a fail-closed status', () => {
 
   assert.deepEqual(report, {
     covered: [
-      'http POST /api',
+      'slot conversation.session.header.utilities',
+    ],
+    blocked: [
+      'http GET /api/session.export',
+      'http GET /sidebar/bundle',
+      'http GET /sidebar/file',
+      'http GET /sidebar/html',
+      'http HEAD /api/session.export',
+      'http POST /sidebar/api/:method',
+      'introspection dsh.stream-carrier-introspection',
+      'websocket /sidebar/ws/agent-terminals',
+      'websocket /sidebar/ws/terminal',
+    ],
+    requiresUpstreamClarification: [
       'operation session.create',
       'operation workspace.create',
       'rpc session.list',
-      'rpc workspace.create',
-      'rpc workspace.members.list',
-      'slot app.sidebar.footer',
-    ],
-    blocked: [
-      'http GET /attachments/:attachmentId',
-      'http GET /sessions/:sessionId/export',
-      'introspection dsh.route-stream-introspection',
-      'operation attachment.attach',
-      'rpc session.export',
       'rpc session.search',
+      'rpc workspace.create',
+      'websocket unresolved DSH stream carrier baseline',
+      'websocket unresolved DSH stream carrier incremental',
     ],
-    requiresUpstreamClarification: [
-      'operation session.fork',
-      'slot session.toolbar',
-      'websocket /events baseline',
-      'websocket /events incremental',
-    ],
-    upstreamContractCandidates: ['DSH-ROUTE-STREAM-INTROSPECTION'],
+    upstreamContractCandidates: ['DSH-STREAM-CARRIER-CONTRACT'],
   })
 })

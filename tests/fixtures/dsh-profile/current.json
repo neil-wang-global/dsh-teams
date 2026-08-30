@@ -2,24 +2,59 @@
   "schemaVersion": 1,
   "dshWeb": {
     "packageName": "@deepseek-ai/dsh-web-app",
-    "version": "0.1.0-rc.6"
+    "version": "0.1.1-rc.2"
   },
   "bundles": [
     {
-      "packageName": "@deepseek-ai/dsh-auth-gate",
-      "version": "0.1.0-rc.6",
+      "packageName": "@deepseek-ai/dsh-base",
+      "version": "0.1.1-rc.2",
       "usedByDshTeams": false
     },
     {
       "packageName": "@deepseek-ai/dsh-web-app",
-      "version": "0.1.0-rc.6",
+      "version": "0.1.1-rc.2",
       "usedByDshTeams": true
+    },
+    {
+      "packageName": "@linxin666/dsh-web-ui-all",
+      "version": "0.2.8",
+      "usedByDshTeams": false
+    },
+    {
+      "packageName": "dsh-auth-gate",
+      "version": "0.7.2",
+      "usedByDshTeams": false
+    },
+    {
+      "packageName": "dsh-deeptutor",
+      "version": "0.1.9",
+      "usedByDshTeams": false
+    },
+    {
+      "packageName": "dsh-notification",
+      "version": "0.1.3",
+      "usedByDshTeams": false
+    },
+    {
+      "packageName": "dsh-plugin-sandbox-escalation-fix",
+      "version": "0.1.1",
+      "usedByDshTeams": false
+    },
+    {
+      "packageName": "dsh-pocket",
+      "version": "2.10.0",
+      "usedByDshTeams": false
+    },
+    {
+      "packageName": "pomasa-studio",
+      "version": "0.1.0",
+      "usedByDshTeams": false
     }
   ],
   "services": [
     {
-      "name": "typertGateway",
-      "signature": "invoke(request)"
+      "name": "apiProxy",
+      "signature": "no physical route registration"
     },
     {
       "name": "webServer",
@@ -29,62 +64,80 @@
   "surfaces": [
     {
       "kind": "http",
-      "id": "GET /attachments/:attachmentId",
+      "id": "GET /api/session.export",
       "status": "blocked",
       "classification": "blocked"
     },
     {
       "kind": "http",
-      "id": "GET /sessions/:sessionId/export",
+      "id": "GET /sidebar/bundle",
       "status": "blocked",
       "classification": "blocked"
     },
     {
       "kind": "http",
-      "id": "POST /api",
-      "status": "covered",
-      "classification": "public-authenticated"
+      "id": "GET /sidebar/file",
+      "status": "blocked",
+      "classification": "blocked"
     },
     {
-      "kind": "rpc",
-      "id": "session.export",
+      "kind": "http",
+      "id": "GET /sidebar/html",
+      "status": "blocked",
+      "classification": "blocked"
+    },
+    {
+      "kind": "http",
+      "id": "HEAD /api/session.export",
+      "status": "blocked",
+      "classification": "blocked"
+    },
+    {
+      "kind": "http",
+      "id": "POST /sidebar/api/:method",
       "status": "blocked",
       "classification": "blocked"
     },
     {
       "kind": "rpc",
       "id": "session.list",
-      "status": "covered",
-      "classification": "workspace-visible-read"
+      "status": "requires-upstream-clarification",
+      "classification": "blocked"
     },
     {
       "kind": "rpc",
       "id": "session.search",
-      "status": "blocked",
+      "status": "requires-upstream-clarification",
       "classification": "blocked"
     },
     {
       "kind": "rpc",
       "id": "workspace.create",
-      "status": "covered",
-      "classification": "owner-write"
-    },
-    {
-      "kind": "rpc",
-      "id": "workspace.members.list",
-      "status": "covered",
-      "classification": "workspace-visible-read"
+      "status": "requires-upstream-clarification",
+      "classification": "blocked"
     },
     {
       "kind": "websocket",
-      "id": "/events",
+      "id": "/sidebar/ws/agent-terminals",
+      "status": "blocked",
+      "classification": "blocked"
+    },
+    {
+      "kind": "websocket",
+      "id": "/sidebar/ws/terminal",
+      "status": "blocked",
+      "classification": "blocked"
+    },
+    {
+      "kind": "websocket",
+      "id": "unresolved DSH stream carrier",
       "mode": "baseline",
       "status": "requires-upstream-clarification",
       "classification": "blocked"
     },
     {
       "kind": "websocket",
-      "id": "/events",
+      "id": "unresolved DSH stream carrier",
       "mode": "incremental",
       "status": "requires-upstream-clarification",
       "classification": "blocked"
@@ -92,41 +145,44 @@
   ],
   "slots": [
     {
-      "id": "app.sidebar.footer",
+      "id": "conversation.session.header.utilities",
       "status": "covered"
-    },
-    {
-      "id": "session.toolbar",
-      "status": "requires-upstream-clarification"
     }
   ],
   "resourceCreatingOperations": [
     {
-      "id": "attachment.attach",
-      "resource": "attachment",
-      "status": "blocked"
-    },
-    {
       "id": "session.create",
-      "resource": "session",
-      "status": "covered"
-    },
-    {
-      "id": "session.fork",
       "resource": "session",
       "status": "requires-upstream-clarification"
     },
     {
       "id": "workspace.create",
       "resource": "workspace",
-      "status": "covered"
+      "status": "requires-upstream-clarification"
     }
   ],
   "introspection": [
     {
-      "id": "dsh.route-stream-introspection",
+      "id": "dsh.stream-carrier-introspection",
       "status": "blocked",
-      "upstreamContractCandidate": "DSH-ROUTE-STREAM-INTROSPECTION"
+      "upstreamContractCandidate": "DSH-STREAM-CARRIER-CONTRACT"
+    }
+  ],
+  "evidence": [
+    {
+      "source": "browser live page",
+      "observation": "Session export triggers a browser download; unauthenticated root returns 401 with no-store.",
+      "reproduction": "Open an authenticated session and export its log; request the unauthenticated root."
+    },
+    {
+      "source": "installed package inventory",
+      "observation": "Installed DSH packages match the versioned bundle inventory.",
+      "reproduction": "Read the installed package inventory from the configured DSH profile."
+    },
+    {
+      "source": "source inspection",
+      "observation": "webServer and apiProxy are present; apiProxy registers no physical routes.",
+      "reproduction": "Inspect DSH Web service registrations and extension declarations."
     }
   ]
 }
