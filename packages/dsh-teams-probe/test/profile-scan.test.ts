@@ -11,6 +11,7 @@ import test from 'node:test'
 import { scanProfile } from '../src/profile-scan.ts'
 import {
   assertCompatibleSnapshot,
+  canonicalSnapshotJson,
   normalizeSnapshot,
   type DshProfile,
 } from '../src/snapshot.ts'
@@ -93,6 +94,18 @@ async function writeProfile(input: unknown): Promise<string> {
   return profileDir
 }
 
+function reverseObjectMemberOrder(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value.map(reverseObjectMemberOrder)
+  }
+  if (value !== null && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value).reverse().map(([key, entry]) => [key, reverseObjectMemberOrder(entry)]),
+    )
+  }
+  return value
+}
+
 test('normalizes a DSH profile into stable canonical JSON', () => {
   const first = normalizeSnapshot(profile)
   const second = normalizeSnapshot({
@@ -109,6 +122,30 @@ test('normalizes a DSH profile into stable canonical JSON', () => {
     status: 'blocked',
     upstreamContractCandidate: 'DSH-STREAM-CARRIER-CONTRACT',
   }])
+})
+
+test('makes canonical JSON and compatibility independent of recorded member order', () => {
+  const reorderedProfile = reverseObjectMemberOrder(profile) as DshProfile
+  const baseline = normalizeSnapshot(profile)
+  const reordered = normalizeSnapshot(reorderedProfile)
+
+  assert.equal(canonicalSnapshotJson(profile), canonicalSnapshotJson(reorderedProfile))
+  assert.doesNotThrow(() => assertCompatibleSnapshot(baseline, reordered))
+})
+
+test('keeps changed recorded values incompatible after member canonicalization', () => {
+  const baseline = normalizeSnapshot(profile)
+  const changedProfile = reverseObjectMemberOrder({
+    ...profile,
+    bundles: profile.bundles.map((bundle) =>
+      bundle.packageName === 'dsh-auth-gate' ? { ...bundle, version: '0.7.3' } : bundle,
+    ),
+  }) as DshProfile
+
+  assert.throws(
+    () => assertCompatibleSnapshot(baseline, normalizeSnapshot(changedProfile)),
+    /changed discovered bundle: dsh-auth-gate/,
+  )
 })
 
 test('normalizes evidence into deterministic source order', () => {

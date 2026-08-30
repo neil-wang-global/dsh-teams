@@ -97,14 +97,32 @@ function evidenceKey(evidence: DshEvidence): string {
   return `${evidence.source}\u0000${evidence.observation}\u0000${evidence.reproduction}`
 }
 
+function canonicalizeJsonValue(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value.map(canonicalizeJsonValue)
+  }
+  if (value !== null && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value)
+        .sort(([left], [right]) => left.localeCompare(right, 'en'))
+        .map(([key, entry]) => [key, canonicalizeJsonValue(entry)]),
+    )
+  }
+  return value
+}
+
+function canonicalJson(value: unknown): string {
+  return JSON.stringify(canonicalizeJsonValue(value))
+}
+
 function assertCompatibleInventorySection<T>(
   section: string,
   expected: readonly T[],
   discovered: readonly T[],
   key: (entry: T) => string,
 ): void {
-  const expectedEntries = new Map(expected.map((entry) => [key(entry), JSON.stringify(entry)]))
-  const discoveredEntries = new Map(discovered.map((entry) => [key(entry), JSON.stringify(entry)]))
+  const expectedEntries = new Map(expected.map((entry) => [key(entry), canonicalJson(entry)]))
+  const discoveredEntries = new Map(discovered.map((entry) => [key(entry), canonicalJson(entry)]))
 
   for (const [entryKey, entry] of expectedEntries) {
     const discoveredEntry = discoveredEntries.get(entryKey)
@@ -152,7 +170,7 @@ export function normalizeSnapshot(profile: DshProfile): DshSurfaceSnapshot {
 }
 
 export function canonicalSnapshotJson(profile: DshProfile): string {
-  return `${JSON.stringify(normalizeSnapshot(profile), null, 2)}\n`
+  return `${JSON.stringify(canonicalizeJsonValue(normalizeSnapshot(profile)), null, 2)}\n`
 }
 
 export function assertCompatibleSnapshot(
