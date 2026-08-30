@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "dshWeb": {
+    "packageName": "@deepseek-ai/dsh-web-app",
+    "version": "0.1.0-rc.6"
+  },
+  "bundles": [
+    {
+      "packageName": "@deepseek-ai/dsh-auth-gate",
+      "version": "0.1.0-rc.6",
+      "usedByDshTeams": false
+    },
+    {
+      "packageName": "@deepseek-ai/dsh-web-app",
+      "version": "0.1.0-rc.6",
+      "usedByDshTeams": true
+    }
+  ],
+  "services": [
+    {
+      "name": "typertGateway",
+      "signature": "invoke(request)"
+    },
+    {
+      "name": "webServer",
+      "signature": "register(route)|registerUpgrade(route)"
+    }
+  ],
+  "surfaces": [
+    {
+      "kind": "http",
+      "id": "GET /attachments/:attachmentId",
+      "status": "blocked",
+      "classification": "blocked"
+    },
+    {
+      "kind": "http",
+      "id": "GET /sessions/:sessionId/export",
+      "status": "blocked",
+      "classification": "blocked"
+    },
+    {
+      "kind": "http",
+      "id": "POST /api",
+      "status": "covered",
+      "classification": "public-authenticated"
+    },
+    {
+      "kind": "rpc",
+      "id": "session.export",
+      "status": "blocked",
+      "classification": "blocked"
+    },
+    {
+      "kind": "rpc",
+      "id": "session.list",
+      "status": "covered",
+      "classification": "workspace-visible-read"
+    },
+    {
+      "kind": "rpc",
+      "id": "session.search",
+      "status": "blocked",
+      "classification": "blocked"
+    },
+    {
+      "kind": "rpc",
+      "id": "workspace.create",
+      "status": "covered",
+      "classification": "owner-write"
+    },
+    {
+      "kind": "rpc",
+      "id": "workspace.members.list",
+      "status": "covered",
+      "classification": "workspace-visible-read"
+    },
+    {
+      "kind": "websocket",
+      "id": "/events",
+      "mode": "baseline",
+      "status": "requires-upstream-clarification",
+      "classification": "blocked"
+    },
+    {
+      "kind": "websocket",
+      "id": "/events",
+      "mode": "incremental",
+      "status": "requires-upstream-clarification",
+      "classification": "blocked"
+    }
+  ],
+  "slots": [
+    {
+      "id": "app.sidebar.footer",
+      "status": "covered"
+    },
+    {
+      "id": "session.toolbar",
+      "status": "requires-upstream-clarification"
+    }
+  ],
+  "resourceCreatingOperations": [
+    {
+      "id": "attachment.attach",
+      "resource": "attachment",
+      "status": "blocked"
+    },
+    {
+      "id": "session.create",
+      "resource": "session",
+      "status": "covered"
+    },
+    {
+      "id": "session.fork",
+      "resource": "session",
+      "status": "requires-upstream-clarification"
+    },
+    {
+      "id": "workspace.create",
+      "resource": "workspace",
+      "status": "covered"
+    }
+  ],
+  "introspection": [
+    {
+      "id": "dsh.route-stream-introspection",
+      "status": "blocked",
+      "upstreamContractCandidate": "DSH-ROUTE-STREAM-INTROSPECTION"
+    }
+  ]
+}
