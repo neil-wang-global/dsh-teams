@@ -87,6 +87,10 @@ function snapshotSurfaceKey(surface: DshSurfaceSnapshot['surfaces'][number]): st
 }
 
 export function normalizeSnapshot(profile: DshProfile): DshSurfaceSnapshot {
+  if (profile.schemaVersion !== 1) {
+    throw new Error('DSH profile schema version 1 is required')
+  }
+
   return {
     schemaVersion: 1,
     dshWeb: { ...profile.dshWeb },
@@ -141,6 +145,12 @@ export function assertCompatibleSnapshot(
   }
 
   const expectedServices = new Map(expected.services.map((service) => [service.name, service.signature]))
+  const discoveredServiceNames = new Set(discovered.services.map((service) => service.name))
+  for (const name of expectedServices.keys()) {
+    if (!discoveredServiceNames.has(name)) {
+      throw new Error(`missing discovered service: ${name}`)
+    }
+  }
   for (const service of discovered.services) {
     const signature = expectedServices.get(service.name)
     if (signature === undefined) {

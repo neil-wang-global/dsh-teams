@@ -51,7 +51,7 @@ const profile: DshProfile = {
   ],
 }
 
-async function writeProfile(input: DshProfile): Promise<string> {
+async function writeProfile(input: unknown): Promise<string> {
   const profileDir = await mkdtemp(join(tmpdir(), 'dsh-profile-'))
   await writeFile(join(profileDir, 'dsh-web-profile.json'), JSON.stringify(input), 'utf8')
   return profileDir
@@ -85,6 +85,15 @@ test('scans only the profile named by DSH_PROFILE_DIR', async () => {
   await assert.rejects(
     () => scanProfile({}),
     /DSH_PROFILE_DIR must name the DSH profile directory/,
+  )
+})
+
+test('rejects a profile that declares an unsupported schema version', async () => {
+  const profileDir = await writeProfile({ ...profile, schemaVersion: 2 })
+
+  await assert.rejects(
+    () => scanProfile({ DSH_PROFILE_DIR: profileDir }),
+    /DSH profile schema version 1 is required/,
   )
 })
 
@@ -129,6 +138,19 @@ test('fails compatibility when the DSH Web version or an inventoried surface cha
       surfaces: profile.surfaces.filter((surface) => surface.id !== 'session.list'),
     })),
     /missing discovered surface: rpc session\.list/,
+  )
+})
+
+test('fails compatibility when an expected service signature is absent from discovery', () => {
+  const expected = normalizeSnapshot(profile)
+  const discovered = normalizeSnapshot({
+    ...profile,
+    services: profile.services.filter((service) => service.name !== 'typertGateway'),
+  })
+
+  assert.throws(
+    () => assertCompatibleSnapshot(expected, discovered),
+    /missing discovered service: typertGateway/,
   )
 })
 
