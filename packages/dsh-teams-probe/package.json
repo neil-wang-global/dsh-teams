@@ -6,6 +6,8 @@
   "license": "MPL-2.0",
   "scripts": {
     "test": "node --test test/*.test.ts",
-    "probe:runtime": "node src/runtime-carrier-cli.ts"
+    "probe:runtime": "node src/runtime-carrier-cli.ts",
+    "capture:runtime": "node src/runtime-registration-capture-cli.ts",
+    "probe:runtime-inventory": "node src/runtime-registration-denial-cli.ts"
   }
 }

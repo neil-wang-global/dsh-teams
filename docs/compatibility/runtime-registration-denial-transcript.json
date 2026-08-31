@@ -1,0 +1,590 @@
+{
+  "version": 1,
+  "transcripts": [
+    {
+      "kind": "http",
+      "id": "exact /api/dsh-skill-explorer/create",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/dsh-skill-explorer/delete",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/dsh-skill-explorer/health",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/dsh-skill-explorer/list",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/dsh-skill-explorer/set-enabled",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/dsh-ssh/cluster",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/dsh-ssh/download",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/dsh-ssh/exec",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/dsh-ssh/hosts",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/dsh-ssh/hosts/import-ssh-config",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/dsh-ssh/ls",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/dsh-ssh/test",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/dsh-ssh/tunnel",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/dsh-ssh/upload",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/dsh-web-ui-settings/describe",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/dsh-web-ui-settings/mutate",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/pair/accept",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/pair/events",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/pair/heartbeat",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/pair/issue",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/pair/revoke",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/pair/status",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/pair/stop",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/pet/diagnostics",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/pet/interact",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/pet/pets",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/pet/set-config",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/pet/set-name",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/pet/set-pet",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/pet/set-visible",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/pet/state",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/plugin-manager/check-updates",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/plugin-manager/failures",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/plugin-manager/install",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/plugin-manager/list",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/plugin-manager/mode",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/plugin-manager/remove",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/plugin-manager/set-enabled",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/plugin-manager/status",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/plugin-manager/update",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/skin-center/v2/active",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/skin-center/v2/catalog",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/skin-center/we/import",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/skin-center/we/inventory",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/skin-center/we/reimport",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/skin-center/we/remove",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/skin-center/we/scene-probe",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/skin-center/we/shim.js",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/task-board/action",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/task-board/events",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/task-board/state",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/update/run",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /api/update/status",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /describe-image/native-images",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /git/events",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /m",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /m/",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /m/api/events.mux",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /m/apple-touch-icon.png",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /m/icon-192.png",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /m/icon-512.png",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /m/manifest.webmanifest",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /m/mobile.js",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /m/offline.html",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /m/service-worker.js",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /plugins/events",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /pomasa/artifact.read",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /pomasa/blueprint.read",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /pomasa/generation.log",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /pomasa/generation.status",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /pomasa/mas.create",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /pomasa/mas.delete",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /pomasa/mas.get",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /pomasa/mas.list",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /pomasa/meta",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /pomasa/record",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /pomasa/run.cancel",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /pomasa/run.intervene",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /pomasa/run.log",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /pomasa/run.start",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /pomasa/unit.list",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "exact /pomasa/unit.state",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "prefix /api",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "prefix /api/pet/decoration",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "prefix /api/pet/runtime",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "prefix /api/skin-center/v2/skins",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "prefix /api/skin-center/we/media",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "prefix /api/skin-center/we/preview",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "prefix /api/skin-center/we/scene-frame",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "prefix /api/skin-center/we/scene-manifest",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "prefix /api/skin-center/we/scene-resource",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "prefix /api/skin-center/we/scene-runtime",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "prefix /api/skin-center/we/scene-video",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "prefix /api/skin-center/we/web",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "prefix /describe-image",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "prefix /describe-image/models",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "prefix /dsh-pocket",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "prefix /git",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "prefix /m/api",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "prefix /pet",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "prefix /plugins",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "prefix /remote",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "prefix /sidebar/api",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "prefix /sidebar/bundle",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "prefix /sidebar/file",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "http",
+      "id": "prefix /sidebar/html",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "rpc",
+      "id": "/api",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "websocket",
+      "id": "/api/dsh-ssh/terminal",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "websocket",
+      "id": "/api/events.host",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "websocket",
+      "id": "/api/events.mux",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "websocket",
+      "id": "/remote/api/dsh-ssh/terminal",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "websocket",
+      "id": "/remote/api/events.host",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "websocket",
+      "id": "/remote/api/events.mux",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "websocket",
+      "id": "/remote/sidebar/ws/agent-terminals",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "websocket",
+      "id": "/remote/sidebar/ws/terminal",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "websocket",
+      "id": "/sidebar/ws/agent-terminals",
+      "observation": "intercepted-denied"
+    },
+    {
+      "kind": "websocket",
+      "id": "/sidebar/ws/terminal",
+      "observation": "intercepted-denied"
+    }
+  ]
+}
