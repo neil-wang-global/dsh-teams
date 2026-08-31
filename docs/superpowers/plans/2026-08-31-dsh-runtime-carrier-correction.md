@@ -62,4 +62,4 @@
 
 - [x] Replace missing-carrier claims with the verified contract and runtime probe command.
 - [x] Restore DT0-02 and DT0-03 to in-progress pending registration-time inventory capture.
-- [ ] Run `npm run check`, inspect the diff, commit, push, and resolve the P1 only after fresh evidence.
+- [x] Run `npm run check`, inspect the diff, commit, push, and resolve the P1 only after fresh evidence.
