@@ -6,7 +6,11 @@ import assert from 'node:assert/strict'
 import { createServer, type Server } from 'node:http'
 import test from 'node:test'
 
-import { CORE_DSH_CARRIERS, probeRuntimeCarriers } from '../src/runtime-carrier-probe.ts'
+import {
+  CORE_DSH_CARRIERS,
+  assertRuntimeCarrierDenial,
+  probeRuntimeCarriers,
+} from '../src/runtime-carrier-probe.ts'
 
 async function startDeniedRuntime(): Promise<{ baseUrl: string; requests: string[]; close(): Promise<void> }> {
   const requests: string[] = []
@@ -44,7 +48,12 @@ test('probes every standard DSH carrier without request payloads', async () => {
   try {
     const result = await probeRuntimeCarriers(runtime.baseUrl)
 
-    assert.deepEqual(result, CORE_DSH_CARRIERS.map((carrier) => ({ ...carrier, status: 401 })))
+    assert.deepEqual(result, CORE_DSH_CARRIERS.map((carrier) => ({
+      ...carrier,
+      status: 401,
+      exposure: 'denied',
+    })))
+    assert.doesNotThrow(() => assertRuntimeCarrierDenial(result))
     assert.deepEqual(runtime.requests, [
       'POST /api/session.list',
       'POST /api/session.search',
@@ -57,7 +66,7 @@ test('probes every standard DSH carrier without request payloads', async () => {
   }
 })
 
-test('rejects a runtime carrier that releases a response', async () => {
+test('reports a runtime carrier that releases a response as not denied', async () => {
   const server = createServer((_request, response) => response.writeHead(200).end())
   await new Promise<void>((resolve, reject) => {
     server.once('error', reject)
@@ -72,10 +81,56 @@ test('rejects a runtime carrier that releases a response', async () => {
   }
 
   try {
-    await assert.rejects(
-      () => probeRuntimeCarriers(`http://127.0.0.1:${address.port}`, [CORE_DSH_CARRIERS[0]]),
-      /expected denial for POST \/api\/session\.list: 200/,
+    const result = await probeRuntimeCarriers(
+      `http://127.0.0.1:${address.port}`,
+      [CORE_DSH_CARRIERS[0]],
     )
+
+    assert.deepEqual(result, [{
+      ...CORE_DSH_CARRIERS[0],
+      status: 200,
+      exposure: 'not-denied',
+    }])
+    assert.throws(
+      () => assertRuntimeCarrierDenial(result),
+      /runtime carrier not denied: POST \/api\/session\.list: 200/,
+    )
+  } finally {
+    await new Promise<void>((resolve) => server.close(() => resolve()))
+  }
+})
+
+test('reports a standard WebSocket upgrade as not denied', async () => {
+  let hasWebSocketKey = false
+  const server = createServer((_request, response) => response.writeHead(404).end())
+  server.on('upgrade', (request, socket) => {
+    hasWebSocketKey = typeof request.headers['sec-websocket-key'] === 'string'
+    socket.end('HTTP/1.1 101 Switching Protocols\r\nConnection: Upgrade\r\nUpgrade: websocket\r\n\r\n')
+  })
+  await new Promise<void>((resolve, reject) => {
+    server.once('error', reject)
+    server.listen({ host: '127.0.0.1', port: 0 }, () => {
+      server.off('error', reject)
+      resolve()
+    })
+  })
+  const address = server.address()
+  if (address === null || typeof address === 'string') {
+    throw new Error('test runtime did not bind a TCP port')
+  }
+
+  try {
+    const result = await probeRuntimeCarriers(
+      `http://127.0.0.1:${address.port}`,
+      [CORE_DSH_CARRIERS[3]],
+    )
+
+    assert.equal(hasWebSocketKey, true)
+    assert.deepEqual(result, [{
+      ...CORE_DSH_CARRIERS[3],
+      status: 101,
+      exposure: 'not-denied',
+    }])
   } finally {
     await new Promise<void>((resolve) => server.close(() => resolve()))
   }

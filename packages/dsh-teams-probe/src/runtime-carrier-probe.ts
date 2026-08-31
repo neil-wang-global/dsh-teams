@@ -4,6 +4,7 @@
 
 import { request } from 'node:http'
 import { connect } from 'node:net'
+import { randomBytes } from 'node:crypto'
 
 export interface RuntimeCarrier {
   kind: 'http' | 'websocket'
@@ -13,7 +14,10 @@ export interface RuntimeCarrier {
 
 export interface RuntimeCarrierResult extends RuntimeCarrier {
   status: number
+  exposure: RuntimeCarrierExposure
 }
+
+export type RuntimeCarrierExposure = 'denied' | 'not-denied'
 
 export const CORE_DSH_CARRIERS: readonly RuntimeCarrier[] = [
   { kind: 'http', method: 'POST', path: '/api/session.list' },
@@ -62,7 +66,7 @@ async function upgradeStatus(url: URL): Promise<number> {
 
     socket.once('connect', () => {
       socket.write(
-        `GET ${url.pathname} HTTP/1.1\r\nHost: ${url.host}\r\nConnection: Upgrade\r\nUpgrade: websocket\r\n\r\n`,
+        `GET ${url.pathname} HTTP/1.1\r\nHost: ${url.host}\r\nConnection: Upgrade\r\nUpgrade: websocket\r\nSec-WebSocket-Key: ${randomBytes(16).toString('base64')}\r\nSec-WebSocket-Version: 13\r\n\r\n`,
       )
     })
     socket.on('data', (chunk: Buffer) => {
@@ -90,10 +94,19 @@ async function upgradeStatus(url: URL): Promise<number> {
   })
 }
 
-function assertDenied(carrier: RuntimeCarrier, status: number): void {
-  if (status !== 401 && status !== 403) {
-    throw new Error(`expected denial for ${carrier.method} ${carrier.path}: ${status}`)
+function exposureFor(status: number): RuntimeCarrierExposure {
+  return status === 401 || status === 403
+    ? 'denied'
+    : 'not-denied'
+}
+
+export function assertRuntimeCarrierDenial(results: readonly RuntimeCarrierResult[]): void {
+  const notDenied = results.filter((result) => result.exposure === 'not-denied')
+  if (notDenied.length === 0) {
+    return
   }
+  const result = notDenied[0]
+  throw new Error(`runtime carrier not denied: ${result.method} ${result.path}: ${result.status}`)
 }
 
 export async function probeRuntimeCarriers(
@@ -107,8 +120,7 @@ export async function probeRuntimeCarriers(
     const status = carrier.kind === 'http'
       ? await requestStatus(url)
       : await upgradeStatus(url)
-    assertDenied(carrier, status)
-    results.push({ ...carrier, status })
+    results.push({ ...carrier, status, exposure: exposureFor(status) })
   }
 
   return results

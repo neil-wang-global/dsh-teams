@@ -65,8 +65,8 @@ const profile: DshProfile = {
   evidence: [
     {
       source: 'browser live page',
-      observation: 'Session export triggers a browser download; unauthenticated root returns 401 with no-store.',
-      reproduction: 'Open an authenticated session and export its log; request the unauthenticated root.',
+      observation: 'Session export triggers a browser download; the current loopback runtime serves the root without an authentication challenge.',
+      reproduction: 'Open an authenticated session and export its log; request the loopback root without credentials.',
     },
     {
       source: 'installed package inventory',

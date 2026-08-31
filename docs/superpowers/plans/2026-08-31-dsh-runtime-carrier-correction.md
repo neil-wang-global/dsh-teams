@@ -1,5 +1,7 @@
 # DSH Runtime Carrier Correction Implementation Plan
 
+> **Live-access update:** The `401`/`403` denial result recorded by the original runtime probe is no longer current. The probe now reports every observed status, fails closed when a carrier is reachable without denial, and uses a standards-compliant WebSocket handshake. The current loopback runtime reports HTTP `415` without JSON and WebSocket `101`; a valid read-only `session.list` RPC returned `200` with its body discarded.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Correct the DSH 0.1.1-rc.2 carrier inventory and prevent fixture-only evidence from selecting a data-plane architecture.
@@ -40,7 +42,7 @@
 - [x] Implement the additional decision state and default incomplete registration scope.
 - [x] Run focused coverage tests.
 
-### Task 3: Probe The Live Runtime Without Credentials
+### Task 3: Audit The Live Runtime Without Credentials
 
 **Files:**
 - Create: `packages/dsh-teams-probe/src/runtime-carrier-probe.ts`
@@ -48,8 +50,8 @@
 - Create: `packages/dsh-teams-probe/test/runtime-carrier-probe.test.ts`
 - Modify: `packages/dsh-teams-probe/package.json`
 
-- [x] Write failing tests for HTTP and WebSocket carrier probes accepting only denial status codes.
-- [x] Implement the probe and environment-driven CLI.
+- [x] Write failing tests for HTTP and WebSocket carrier probes recording both denial and reachability states.
+- [x] Implement the probe and environment-driven CLI with a standards-compliant WebSocket handshake.
 - [x] Run it against `http://127.0.0.1:3080` without credentials.
 
 ### Task 4: Replace The Stale Architecture Record
