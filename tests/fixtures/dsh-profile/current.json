@@ -54,7 +54,7 @@
   "services": [
     {
       "name": "apiProxy",
-      "signature": "no physical route registration"
+      "signature": "POST /api/:method|upgrade /api/events.mux|upgrade /api/events.host"
     },
     {
       "name": "webServer",
@@ -94,26 +94,26 @@
     },
     {
       "kind": "http",
+      "id": "POST /api/:method",
+      "status": "blocked",
+      "classification": "blocked"
+    },
+    {
+      "kind": "http",
       "id": "POST /sidebar/api/:method",
       "status": "blocked",
       "classification": "blocked"
     },
     {
-      "kind": "rpc",
-      "id": "session.list",
-      "status": "requires-upstream-clarification",
+      "kind": "websocket",
+      "id": "/api/events.host",
+      "status": "blocked",
       "classification": "blocked"
     },
     {
-      "kind": "rpc",
-      "id": "session.search",
-      "status": "requires-upstream-clarification",
-      "classification": "blocked"
-    },
-    {
-      "kind": "rpc",
-      "id": "workspace.create",
-      "status": "requires-upstream-clarification",
+      "kind": "websocket",
+      "id": "/api/events.mux",
+      "status": "blocked",
       "classification": "blocked"
     },
     {
@@ -127,20 +127,6 @@
       "id": "/sidebar/ws/terminal",
       "status": "blocked",
       "classification": "blocked"
-    },
-    {
-      "kind": "websocket",
-      "id": "unresolved DSH stream carrier",
-      "mode": "baseline",
-      "status": "requires-upstream-clarification",
-      "classification": "blocked"
-    },
-    {
-      "kind": "websocket",
-      "id": "unresolved DSH stream carrier",
-      "mode": "incremental",
-      "status": "requires-upstream-clarification",
-      "classification": "blocked"
     }
   ],
   "slots": [
@@ -153,26 +139,26 @@
     {
       "id": "session.create",
       "resource": "session",
-      "status": "requires-upstream-clarification"
+      "status": "blocked"
     },
     {
       "id": "workspace.create",
       "resource": "workspace",
-      "status": "requires-upstream-clarification"
+      "status": "blocked"
     }
   ],
   "introspection": [
     {
-      "id": "dsh.stream-carrier-introspection",
+      "id": "dsh.runtime-registration-inventory",
       "status": "blocked",
-      "upstreamContractCandidate": "DSH-STREAM-CARRIER-CONTRACT"
+      "upstreamContractCandidate": "DSH-RUNTIME-REGISTRATION-INVENTORY"
     }
   ],
   "evidence": [
     {
       "source": "browser live page",
-      "observation": "Session export triggers a browser download; unauthenticated root returns 401 with no-store.",
-      "reproduction": "Open an authenticated session and export its log; request the unauthenticated root."
+      "observation": "Session export triggers a browser download; the current loopback runtime serves the root without an authentication challenge.",
+      "reproduction": "Open an authenticated session and export its log; request the loopback root without credentials."
     },
     {
       "source": "installed package inventory",
@@ -181,8 +167,8 @@
     },
     {
       "source": "source inspection",
-      "observation": "webServer and apiProxy are present; apiProxy registers no physical routes.",
-      "reproduction": "Inspect DSH Web service registrations and extension declarations."
+      "observation": "apiProxy uses POST /api/:method and event upgrades at /api/events.mux and /api/events.host.",
+      "reproduction": "Inspect dsh-client-connection and dsh-host-apiproxy carrier registrations."
     }
   ]
 }

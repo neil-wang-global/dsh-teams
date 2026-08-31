@@ -60,9 +60,9 @@ All tasks begin as `not-started`. Move a task to `in-progress` only after its de
 
 | Task | Status | Dependency | Gate or release effect |
 |---|---|---|---|
-| DT-0-01 | not-started | None | Enables manifest validation. |
-| DT-0-02 | not-started | DT-0-01 | Produces the source inventory for Gate A. |
-| DT-0-03 | not-started | DT-0-02 | Proves or rejects in-process coverage. |
+| DT-0-01 | complete | None | Enables manifest validation. |
+| DT-0-02 | in-progress | DT-0-01 | Core carriers are recorded; composed runtime registration inventory remains. |
+| DT-0-03 | in-progress | DT-0-02 | Awaits a real composed-runtime deny probe. |
 | DT-0-04 | not-started | DT-0-03 | Records Gate A architecture decision. |
 | DT-1-01 | not-started | Gate A | Establishes core configuration contract. |
 | DT-1-02 | not-started | DT-1-01 | Establishes secure persistence. |
@@ -95,10 +95,10 @@ All tasks begin as `not-started`. Move a task to `in-progress` only after its de
 **Completion check:** `npm test --workspace @dsh-teams/probe` passes; a deliberately unclassified fixture fails with the route or stream name.
 **Failure disposition:** Stop before any identity or UI work; repair probe coverage rather than treating an unknown surface as harmless.
 
-- [ ] Add npm workspace scripts for `test`, `test:probe`, `lint:plan`, and `check` without changing the existing hook scripts.
-- [ ] Write failing `node:test` cases for accepted categories `public-authenticated`, `workspace-visible-read`, `holder-write`, `owner-write`, `system-admin`, and `blocked`.
-- [ ] Implement manifest parsing that rejects duplicate identifiers, omitted classification, and a non-blocked action without a resource scope.
-- [ ] Commit the package and passing test evidence with `test(probe): validate compatibility manifest`.
+- [x] Add npm workspace scripts for `test`, `test:probe`, `lint:plan`, and `check` without changing the existing hook scripts.
+- [x] Write failing `node:test` cases for accepted categories `public-authenticated`, `workspace-visible-read`, `holder-write`, `owner-write`, `system-admin`, and `blocked`.
+- [x] Implement manifest parsing that rejects duplicate identifiers, omitted classification, and a non-blocked action without a resource scope.
+- [x] Commit the package and passing test evidence with `test(probe): validate compatibility manifest`.
 
 ### DT-0-02: Produce a versioned DSH surface inventory
 
@@ -109,11 +109,12 @@ All tasks begin as `not-started`. Move a task to `in-progress` only after its de
 **Completion check:** The scanner produces a canonical JSON snapshot; committed Markdown identifies every discovered surface as covered, blocked, or requiring upstream clarification.
 **Failure disposition:** Missing introspection becomes an explicit blocked entry and creates an upstream-contract candidate, not an implicit allow.
 
-- [ ] Write fixtures for `session.list`, workspace operations, attachment/download, search/export, RPC, and both WebSocket stream modes.
-- [ ] Add tests proving snapshot normalization is deterministic and a new discovered endpoint makes the compatibility check fail.
-- [ ] Implement profile scanning from an explicit `DSH_PROFILE_DIR`; never hard-code a user's profile path in source.
-- [ ] Record the observed profile bundle list, including the fact that `dsh-auth-gate` may be installed but is not used by `dsh-teams`.
-- [ ] Commit report and fixtures with `docs(compatibility): inventory DSH authorization surface`.
+- [x] Write fixtures for `session.list`, workspace operations, attachment/download, search/export, RPC, and both WebSocket stream modes.
+- [x] Add tests proving snapshot normalization is deterministic and a new discovered endpoint makes the compatibility check fail.
+- [x] Implement profile scanning from an explicit `DSH_PROFILE_DIR`; never hard-code a user's profile path in source.
+- [x] Record the observed profile bundle list, including the fact that `dsh-auth-gate` may be installed but is not used by `dsh-teams`.
+- [x] Commit report and fixtures with `docs(compatibility): inventory DSH authorization surface`.
+- [ ] Capture every route, upgrade, and generic RPC registration from a disposable composed runtime; update the report and fixture from that trace.
 
 ### DT-0-03: Prove or reject in-process interception coverage
 
@@ -122,12 +123,12 @@ All tasks begin as `not-started`. Move a task to `in-progress` only after its de
 **Files:** Create `packages/dsh-teams-probe/src/in-process-probe.mjs`, `packages/dsh-teams-probe/src/probe-server.mjs`, `packages/dsh-teams-probe/test/in-process-probe.test.mjs`, `docs/compatibility/in-process-coverage.md`.
 **Outcome:** Black-box probes establish whether HTTP RPC, static/download/attachment requests, WS upgrade, baseline stream, and incremental stream all pass through a single non-bypassable adapter.
 **Completion check:** Every inventory entry has a test transcript showing interception and denial; direct raw route attempts are rejected or are classified as an architecture failure.
-**Failure disposition:** Set the decision to `sidecar-required`; do not partially enable in-process multi-user behavior.
+**Failure disposition:** A proven bypass sets the decision to `sidecar-required`; an incomplete registration inventory sets `runtime-inventory-required`. Do not partially enable in-process multi-user behavior.
 
-- [ ] Write failing probe tests for a route that bypasses an adapter, a duplicated raw route, and an incremental WS frame that is emitted after authorization changes.
-- [ ] Implement a temporary Fiber-scoped probe adapter that records only route/method/frame metadata and can deny test traffic.
-- [ ] Execute against a disposable DSH profile and store redacted transcripts in `docs/compatibility/in-process-coverage.md`.
-- [ ] Commit evidence with `test(probe): prove in-process authorization coverage` or `docs(compatibility): require sidecar gateway`.
+- [x] Write failing probe tests for a route that bypasses an adapter, a duplicated raw route, and an incremental WS frame that is emitted after authorization changes.
+- [x] Implement a temporary Fiber-scoped probe adapter that records only route/method/frame metadata and can deny test traffic.
+- [x] Execute against a disposable DSH profile and store redacted transcripts in `docs/compatibility/in-process-coverage.md`.
+- [ ] Capture and deny-probe the complete composed runtime registration inventory before choosing an adapter architecture.
 
 ### DT-0-04: Prove execution isolation and record the architecture decision
 

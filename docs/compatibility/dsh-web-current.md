@@ -15,7 +15,7 @@ The observed installed-package inventory records `@deepseek-ai/dsh-base@0.1.1-rc
 
 | Service | Observed signature | Disposition |
 | --- | --- | --- |
-| `apiProxy` | No physical route registration | Covered as a transport-agnostic service only |
+| `apiProxy` | `POST /api/:method`; upgrades at `/api/events.mux` and `/api/events.host` | Core carrier contract proven; plugin registration inventory remains pending |
 | `webServer` | `register(route)`, `registerUpgrade(route)` | Covered |
 
 ## Surface Disposition
@@ -24,29 +24,31 @@ The observed installed-package inventory records `@deepseek-ai/dsh-base@0.1.1-rc
 | --- | --- | --- | --- |
 | HTTP | `HEAD /api/session.export` | Blocked | The header action probes the export URL with `sessionId` and `includeDescendants=true` before download |
 | HTTP | `GET /api/session.export` | Blocked | The browser then downloads the Session ZIP from the same export URL; descendant logs and attachments are in scope |
-| HTTP | `POST /sidebar/api/:method` | Blocked | Source-confirmed physical route; `apiProxy` transport remains unclassified |
+| HTTP | `POST /api/:method` | Blocked | Source-confirmed core RPC carrier; the current no-credential carrier probe reaches it (`415` without JSON), and a valid `session.list` envelope returned `200` |
+| HTTP | `POST /sidebar/api/:method` | Blocked | Source-confirmed sidebar RPC carrier |
 | HTTP | `GET /sidebar/file` | Blocked | Source-confirmed download route with `sessionId`, `path`, optional `cwd`, and `download=1` query fields |
 | HTTP | `GET /sidebar/html` | Blocked | Source-confirmed physical route |
 | HTTP | `GET /sidebar/bundle` | Blocked | Source-confirmed physical route |
 | WebSocket | `/sidebar/ws/terminal` | Blocked | Source-confirmed physical route |
 | WebSocket | `/sidebar/ws/agent-terminals` | Blocked | Source-confirmed physical route |
-| RPC | `session.list`, `session.search`, `workspace.create` | Requires upstream clarification | Source-confirmed `apiProxy` methods, but the physical carrier has no route registration |
-| WebSocket | unresolved DSH stream carrier, baseline | Requires upstream clarification | Source includes baseline frames, but no live carrier URL is registered |
-| WebSocket | unresolved DSH stream carrier, incremental | Requires upstream clarification | Incremental frame delivery needs the same upstream carrier contract |
+| WebSocket | `/api/events.mux` | Blocked | Source-confirmed core event carrier; a no-credential standard upgrade returned `101` |
+| WebSocket | `/api/events.host` | Blocked | Source-confirmed core event carrier; a no-credential standard upgrade returned `101` |
 | Client slot | `conversation.session.header.utilities` | Covered | Source-confirmed extension slot |
-| Resource creation | `session.create` | Requires upstream clarification | Source-confirmed behind transport-agnostic `apiProxy` |
-| Resource creation | `workspace.create` | Requires upstream clarification | Source-confirmed behind transport-agnostic `apiProxy` |
+| Resource creation | `session.create` | Blocked | Reaches the source-confirmed `POST /api/:method` core carrier |
+| Resource creation | `workspace.create` | Blocked | Reaches the source-confirmed `POST /api/:method` core carrier |
 
 ## Blocked Introspection Contract
 
-No confirmed carrier or contract exposes the complete DSH stream inventory. The snapshot therefore contains the explicit blocked entry `dsh.stream-carrier-introspection`, with upstream-contract candidate `DSH-STREAM-CARRIER-CONTRACT`. It records baseline and incremental mode coverage against an explicitly unresolved carrier; it does not infer an `/events` route.
+The snapshot contains the explicit blocked entry `dsh.runtime-registration-inventory`, with upstream-contract candidate `DSH-RUNTIME-REGISTRATION-INVENTORY`. The DSH core carrier contract is known, but the composed plugin runtime can add registrations dynamically. Phase 0 must capture every `webServer.register`, `webServer.registerUpgrade`, and generic RPC registration while composing the configured profile, then deny-probe every captured carrier.
 
-The requested contract must enumerate stream carriers, stream modes, owning bundle, and service signature before Phase 0 can treat an unobserved entry as anything other than blocked. The compatibility check fails when discovery adds or removes a surface, changes the DSH Web version, or changes an observed service signature.
+Until that registration-time inventory exists, the data-plane assessment is `runtime-inventory-required`, not `in-process-covered` and not `sidecar-required`. `ctx.connection.rpc.intercept('/api', ...)` is a documented shared HTTP RPC seam, but the inspected public interfaces expose no corresponding interceptor for the two core event upgrades; their paths are already exclusively registered by DSH. A captured route that bypasses the selected adapter remains an architecture failure and selects `sidecar-required`. The compatibility check fails when discovery adds or removes a surface, changes the DSH Web version, or changes an observed service signature.
 
 ## Evidence Records
 
 | Source | Observation | Reproduction |
 | --- | --- | --- |
-| Browser live page | Session export triggers a browser download; the unauthenticated root returns `401` with `no-store`. | Open an authenticated session and export its log; request the unauthenticated root. |
+| Browser live page | Session export triggers a browser download; the current loopback root returns `200` without an authentication challenge. | Open an authenticated session and export its log; request the loopback root without credentials. |
 | Installed package inventory | The installed packages and versions match the canonical fixture. | Read the installed package inventory from the configured DSH profile. |
-| Source inspection | `webServer` and `apiProxy` are present; `apiProxy` registers no physical routes. The sidebar registers its HTTP and WebSocket routes, while the export client performs the `HEAD` then browser download flow. | Inspect DSH Web service registrations and extension declarations. |
+| Source inspection | `apiProxy` uses `POST /api/:method`, with event upgrades at `/api/events.mux` and `/api/events.host`. The sidebar registers its HTTP and WebSocket routes, while the export client performs the `HEAD` then browser download flow. | Inspect DSH Web service registrations, client transport constants, and extension declarations. |
+| Runtime carrier audit | The current no-credential runtime reached each HTTP carrier (`415` for missing JSON content type) and accepted both standard WS upgrades (`101`). The audit exits nonzero for any non-`401`/`403` result. | `DSH_RUNTIME_URL=http://127.0.0.1:3080 npm run probe:runtime` |
+| Read-only RPC probe | A valid no-credential `session.list` envelope returned `200`; its body was not retained. | POST a conforming `client-request` envelope to `/api/session.list`, discard the response body, and record only status and byte count. |

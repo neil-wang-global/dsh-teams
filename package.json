@@ -11,6 +11,7 @@
     "prepare": "lefthook install --force",
     "test": "npm run test --workspaces --if-present",
     "test:probe": "npm test --workspace @dsh-teams/probe",
+    "probe:runtime": "npm run probe:runtime --workspace @dsh-teams/probe",
     "lint:plan": "tsc --noEmit -p packages/dsh-teams-probe/tsconfig.json",
     "check": "npm run lint:plan && npm run test:probe"
   },

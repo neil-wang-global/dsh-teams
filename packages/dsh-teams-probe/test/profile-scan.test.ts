@@ -33,47 +33,40 @@ const profile: DshProfile = {
   ],
   services: [
     { name: 'webServer', signature: 'register(route)|registerUpgrade(route)' },
-    { name: 'apiProxy', signature: 'no physical route registration' },
+    { name: 'apiProxy', signature: 'POST /api/:method|upgrade /api/events.mux|upgrade /api/events.host' },
   ],
   surfaces: [
     { kind: 'http', id: 'GET /api/session.export', status: 'blocked', classification: 'blocked' },
     { kind: 'http', id: 'HEAD /api/session.export', status: 'blocked', classification: 'blocked' },
+    { kind: 'http', id: 'POST /api/:method', status: 'blocked', classification: 'blocked' },
     { kind: 'http', id: 'POST /sidebar/api/:method', status: 'blocked', classification: 'blocked' },
     { kind: 'http', id: 'GET /sidebar/file', status: 'blocked', classification: 'blocked' },
     { kind: 'http', id: 'GET /sidebar/html', status: 'blocked', classification: 'blocked' },
     { kind: 'http', id: 'GET /sidebar/bundle', status: 'blocked', classification: 'blocked' },
-    { kind: 'rpc', id: 'session.list', status: 'requires-upstream-clarification', classification: 'blocked' },
-    { kind: 'rpc', id: 'session.search', status: 'requires-upstream-clarification', classification: 'blocked' },
-    { kind: 'rpc', id: 'workspace.create', status: 'requires-upstream-clarification', classification: 'blocked' },
+    { kind: 'websocket', id: '/api/events.mux', status: 'blocked', classification: 'blocked' },
+    { kind: 'websocket', id: '/api/events.host', status: 'blocked', classification: 'blocked' },
     { kind: 'websocket', id: '/sidebar/ws/terminal', status: 'blocked', classification: 'blocked' },
     { kind: 'websocket', id: '/sidebar/ws/agent-terminals', status: 'blocked', classification: 'blocked' },
-    {
-      kind: 'websocket',
-      id: 'unresolved DSH stream carrier',
-      mode: 'baseline',
-      status: 'requires-upstream-clarification',
-      classification: 'blocked',
-    },
-    {
-      kind: 'websocket',
-      id: 'unresolved DSH stream carrier',
-      mode: 'incremental',
-      status: 'requires-upstream-clarification',
-      classification: 'blocked',
-    },
   ],
   slots: [
     { id: 'conversation.session.header.utilities', status: 'covered' },
   ],
   resourceCreatingOperations: [
-    { id: 'session.create', resource: 'session', status: 'requires-upstream-clarification' },
-    { id: 'workspace.create', resource: 'workspace', status: 'requires-upstream-clarification' },
+    { id: 'session.create', resource: 'session', status: 'blocked' },
+    { id: 'workspace.create', resource: 'workspace', status: 'blocked' },
+  ],
+  introspection: [
+    {
+      id: 'dsh.runtime-registration-inventory',
+      status: 'blocked',
+      upstreamContractCandidate: 'DSH-RUNTIME-REGISTRATION-INVENTORY',
+    },
   ],
   evidence: [
     {
       source: 'browser live page',
-      observation: 'Session export triggers a browser download; unauthenticated root returns 401 with no-store.',
-      reproduction: 'Open an authenticated session and export its log; request the unauthenticated root.',
+      observation: 'Session export triggers a browser download; the current loopback runtime serves the root without an authentication challenge.',
+      reproduction: 'Open an authenticated session and export its log; request the loopback root without credentials.',
     },
     {
       source: 'installed package inventory',
@@ -82,8 +75,8 @@ const profile: DshProfile = {
     },
     {
       source: 'source inspection',
-      observation: 'webServer and apiProxy are present; apiProxy registers no physical routes.',
-      reproduction: 'Inspect DSH Web service registrations and extension declarations.',
+      observation: 'apiProxy uses POST /api/:method and event upgrades at /api/events.mux and /api/events.host.',
+      reproduction: 'Inspect dsh-client-connection and dsh-host-apiproxy carrier registrations.',
     },
   ],
 }
@@ -118,9 +111,9 @@ test('normalizes a DSH profile into stable canonical JSON', () => {
   assert.deepEqual(first, second)
   assert.equal(JSON.stringify(first), JSON.stringify(second))
   assert.deepEqual(first.introspection, [{
-    id: 'dsh.stream-carrier-introspection',
+    id: 'dsh.runtime-registration-inventory',
     status: 'blocked',
-    upstreamContractCandidate: 'DSH-STREAM-CARRIER-CONTRACT',
+    upstreamContractCandidate: 'DSH-RUNTIME-REGISTRATION-INVENTORY',
   }])
 })
 
@@ -172,7 +165,7 @@ test('normalizes evidence into deterministic source order', () => {
   )
 })
 
-test('retains live export, RPC, and unresolved stream-mode evidence', () => {
+test('retains live export, API, and event carrier evidence', () => {
   const surfaces = normalizeSnapshot(profile).surfaces
 
   assert.deepEqual(
@@ -183,14 +176,12 @@ test('retains live export, RPC, and unresolved stream-mode evidence', () => {
       'http GET /sidebar/file',
       'http GET /sidebar/html',
       'http HEAD /api/session.export',
+      'http POST /api/:method',
       'http POST /sidebar/api/:method',
-      'rpc session.list',
-      'rpc session.search',
-      'rpc workspace.create',
+      'websocket /api/events.host',
+      'websocket /api/events.mux',
       'websocket /sidebar/ws/agent-terminals',
       'websocket /sidebar/ws/terminal',
-      'websocket unresolved DSH stream carrier baseline',
-      'websocket unresolved DSH stream carrier incremental',
     ],
   )
 })
@@ -433,20 +424,17 @@ test('reports every inventoried item under a fail-closed status', () => {
       'http GET /sidebar/file',
       'http GET /sidebar/html',
       'http HEAD /api/session.export',
+      'http POST /api/:method',
       'http POST /sidebar/api/:method',
-      'introspection dsh.stream-carrier-introspection',
+      'introspection dsh.runtime-registration-inventory',
+      'operation session.create',
+      'operation workspace.create',
+      'websocket /api/events.host',
+      'websocket /api/events.mux',
       'websocket /sidebar/ws/agent-terminals',
       'websocket /sidebar/ws/terminal',
     ],
-    requiresUpstreamClarification: [
-      'operation session.create',
-      'operation workspace.create',
-      'rpc session.list',
-      'rpc session.search',
-      'rpc workspace.create',
-      'websocket unresolved DSH stream carrier baseline',
-      'websocket unresolved DSH stream carrier incremental',
-    ],
-    upstreamContractCandidates: ['DSH-STREAM-CARRIER-CONTRACT'],
+    requiresUpstreamClarification: [],
+    upstreamContractCandidates: ['DSH-RUNTIME-REGISTRATION-INVENTORY'],
   })
 })
