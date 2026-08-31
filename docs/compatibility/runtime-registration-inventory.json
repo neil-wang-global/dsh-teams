@@ -1,0 +1,590 @@
+{
+  "version": 1,
+  "registrations": [
+    {
+      "carrier": "connection.rpc.intercept",
+      "kind": "rpc",
+      "id": "/api"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/dsh-skill-explorer/create"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/dsh-skill-explorer/delete"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/dsh-skill-explorer/health"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/dsh-skill-explorer/list"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/dsh-skill-explorer/set-enabled"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/dsh-ssh/cluster"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/dsh-ssh/download"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/dsh-ssh/exec"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/dsh-ssh/hosts"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/dsh-ssh/hosts/import-ssh-config"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/dsh-ssh/ls"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/dsh-ssh/test"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/dsh-ssh/tunnel"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/dsh-ssh/upload"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/dsh-web-ui-settings/describe"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/dsh-web-ui-settings/mutate"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/pair/accept"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/pair/events"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/pair/heartbeat"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/pair/issue"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/pair/revoke"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/pair/status"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/pair/stop"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/pet/diagnostics"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/pet/interact"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/pet/pets"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/pet/set-config"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/pet/set-name"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/pet/set-pet"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/pet/set-visible"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/pet/state"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/plugin-manager/check-updates"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/plugin-manager/failures"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/plugin-manager/install"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/plugin-manager/list"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/plugin-manager/mode"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/plugin-manager/remove"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/plugin-manager/set-enabled"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/plugin-manager/status"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/plugin-manager/update"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/skin-center/v2/active"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/skin-center/v2/catalog"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/skin-center/we/import"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/skin-center/we/inventory"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/skin-center/we/reimport"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/skin-center/we/remove"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/skin-center/we/scene-probe"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/skin-center/we/shim.js"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/task-board/action"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/task-board/events"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/task-board/state"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/update/run"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /api/update/status"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /describe-image/native-images"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /git/events"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /m"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /m/"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /m/api/events.mux"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /m/apple-touch-icon.png"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /m/icon-192.png"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /m/icon-512.png"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /m/manifest.webmanifest"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /m/mobile.js"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /m/offline.html"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /m/service-worker.js"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /plugins/events"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /pomasa/artifact.read"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /pomasa/blueprint.read"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /pomasa/generation.log"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /pomasa/generation.status"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /pomasa/mas.create"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /pomasa/mas.delete"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /pomasa/mas.get"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /pomasa/mas.list"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /pomasa/meta"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /pomasa/record"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /pomasa/run.cancel"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /pomasa/run.intervene"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /pomasa/run.log"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /pomasa/run.start"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /pomasa/unit.list"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "exact /pomasa/unit.state"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "prefix /api"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "prefix /api/pet/decoration"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "prefix /api/pet/runtime"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "prefix /api/skin-center/v2/skins"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "prefix /api/skin-center/we/media"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "prefix /api/skin-center/we/preview"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "prefix /api/skin-center/we/scene-frame"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "prefix /api/skin-center/we/scene-manifest"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "prefix /api/skin-center/we/scene-resource"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "prefix /api/skin-center/we/scene-runtime"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "prefix /api/skin-center/we/scene-video"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "prefix /api/skin-center/we/web"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "prefix /describe-image"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "prefix /describe-image/models"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "prefix /dsh-pocket"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "prefix /git"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "prefix /m/api"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "prefix /pet"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "prefix /plugins"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "prefix /remote"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "prefix /sidebar/api"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "prefix /sidebar/bundle"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "prefix /sidebar/file"
+    },
+    {
+      "carrier": "webServer.register",
+      "kind": "http",
+      "id": "prefix /sidebar/html"
+    },
+    {
+      "carrier": "webServer.registerUpgrade",
+      "kind": "websocket",
+      "id": "/api/dsh-ssh/terminal"
+    },
+    {
+      "carrier": "webServer.registerUpgrade",
+      "kind": "websocket",
+      "id": "/api/events.host"
+    },
+    {
+      "carrier": "webServer.registerUpgrade",
+      "kind": "websocket",
+      "id": "/api/events.mux"
+    },
+    {
+      "carrier": "webServer.registerUpgrade",
+      "kind": "websocket",
+      "id": "/remote/api/dsh-ssh/terminal"
+    },
+    {
+      "carrier": "webServer.registerUpgrade",
+      "kind": "websocket",
+      "id": "/remote/api/events.host"
+    },
+    {
+      "carrier": "webServer.registerUpgrade",
+      "kind": "websocket",
+      "id": "/remote/api/events.mux"
+    },
+    {
+      "carrier": "webServer.registerUpgrade",
+      "kind": "websocket",
+      "id": "/remote/sidebar/ws/agent-terminals"
+    },
+    {
+      "carrier": "webServer.registerUpgrade",
+      "kind": "websocket",
+      "id": "/remote/sidebar/ws/terminal"
+    },
+    {
+      "carrier": "webServer.registerUpgrade",
+      "kind": "websocket",
+      "id": "/sidebar/ws/agent-terminals"
+    },
+    {
+      "carrier": "webServer.registerUpgrade",
+      "kind": "websocket",
+      "id": "/sidebar/ws/terminal"
+    }
+  ]
+}

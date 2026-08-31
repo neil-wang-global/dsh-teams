@@ -61,8 +61,8 @@ All tasks begin as `not-started`. Move a task to `in-progress` only after its de
 | Task | Status | Dependency | Gate or release effect |
 |---|---|---|---|
 | DT-0-01 | complete | None | Enables manifest validation. |
-| DT-0-02 | deferred | DT-0-01 | Dynamic in-process registration capture is not needed after the supported core event seam is rejected; retain the blocked inventory entry as a sidecar profile-drift signal. |
-| DT-0-03 | complete | DT-0-02 (deferred by sidecar disposition) | Fresh carrier audit and installed-source inspection select `sidecar-required` because required core event upgrades are unfilterable in process. |
+| DT-0-02 | complete | DT-0-01 | Disposable composed runtime capture records every discovered HTTP, WebSocket, and generic RPC registration; the redacted inventory is versioned. |
+| DT-0-03 | complete | DT-0-02 | Every captured registration has an adapter-denial transcript; raw core carrier probes and source inspection select `sidecar-required` because required event upgrades are unfilterable in process. |
 | DT-0-04 | not-started | DT-0-03 | Selects the independent execution-plane boundary before Gate A can pass. |
 | DT-1-01 | not-started | Gate A | Establishes core configuration contract. |
 | DT-1-02 | not-started | DT-1-01 | Establishes secure persistence. |
@@ -114,7 +114,7 @@ All tasks begin as `not-started`. Move a task to `in-progress` only after its de
 - [x] Implement profile scanning from an explicit `DSH_PROFILE_DIR`; never hard-code a user's profile path in source.
 - [x] Record the observed profile bundle list, including the fact that `dsh-auth-gate` may be installed but is not used by `dsh-teams`.
 - [x] Commit report and fixtures with `docs(compatibility): inventory DSH authorization surface`.
-- [ ] Capture every route, upgrade, and generic RPC registration from a disposable composed runtime; deferred because the supported core event WebSocket seam is unfilterable and DT-0-03 selects a sidecar before this in-process proof is needed.
+- [x] Capture every route, upgrade, and generic RPC registration from a disposable composed runtime; `runtime-registration-inventory.json` records 117 unique registrations and `runtime-registration-denial-transcript.json` supplies a `403` adapter transcript for each.
 
 ### DT-0-03: Prove or reject in-process interception coverage
 
@@ -128,7 +128,7 @@ All tasks begin as `not-started`. Move a task to `in-progress` only after its de
 - [x] Write failing probe tests for a route that bypasses an adapter, a duplicated raw route, and an incremental WS frame that is emitted after authorization changes.
 - [x] Implement a temporary Fiber-scoped probe adapter that records only route/method/frame metadata and can deny test traffic.
 - [x] Execute against a disposable DSH profile and store redacted transcripts in `docs/compatibility/in-process-coverage.md`.
-- [x] Audit the required core carriers and reject the in-process adapter when the two core event upgrades have no supported filtering seam; record the sidecar disposition and defer the in-process registration capture.
+- [x] Audit the required core carriers and reject the in-process adapter when the two core event upgrades have no supported filtering seam; record the `sidecar-required` disposition after the complete registration capture.
 
 ### DT-0-04: Prove execution isolation and record the architecture decision
 

@@ -12,6 +12,18 @@ The canonical fixture inventory records `@deepseek-ai/dsh-base@0.1.1-rc.2`, `@de
 
 `Covered` means the surface has a versioned inventory and policy classification. It does not claim interception proof, which remains the DT-0-03 gate.
 
+## Composed Runtime Registration Capture
+
+`runtime-registration-inventory.json` is the canonical dynamic capture from a disposable composition of the supplied `web` profile. The launcher receives a temporary `DSH_HOME` with a symlinked profile, an ephemeral listener, and a one-run `--patch`; its normal profile, state, task ledger, and the live listener at `3080` are not reused. The observer starts before every discovered Web/RPC registrant and records only the registration API, carrier kind, and route or channel.
+
+| Carrier | Captured registrations | Multi-user disposition |
+| --- | ---: | --- |
+| `webServer.register` | 106 | Blocked behind the selected sidecar |
+| `webServer.registerUpgrade` | 10 | Blocked behind the selected sidecar |
+| `connection.rpc.intercept` | 1 | Blocked behind the selected sidecar |
+
+The adjacent `runtime-registration-denial-transcript.json` has one network-level `403` adapter transcript for every one of the 117 captured entries. It establishes that a complete external adapter inventory exists; it does not claim that the unmodified DSH runtime supplies that adapter.
+
 ## Service Observations
 
 | Service | Observed signature | Disposition |
@@ -40,11 +52,11 @@ The canonical fixture inventory records `@deepseek-ai/dsh-base@0.1.1-rc.2`, `@de
 
 ## Data-Plane Decision
 
-**`sidecar-required` for the data plane.** The required core event WebSockets register directly through `webServer.registerUpgrade`. The public registry permits one handler for each path and rejects a duplicate; it exposes no interception or replacement seam. The only shared interception facility, `ctx.connection.rpc.intercept('/api', ...)`, applies to HTTP RPC endpoints and cannot filter either event upgrade or its frames.
+**`sidecar-required` for the data plane.** The required core event WebSockets register directly through `webServer.registerUpgrade`. The public registry permits one handler for each path and rejects a duplicate; it exposes no filtering or replacement seam. The only shared interception facility, `ctx.connection.rpc.intercept('/api', ...)`, applies to HTTP RPC endpoints and cannot filter either event upgrade or its frames.
 
 The no-credential runtime audit reached both WebSocket paths with `101`; the raw listener is therefore not an authorization boundary. A supported registration-time capture cannot repair this missing filtering seam, and private route-table mutation is not accepted as proof. The sidecar must be the only multi-user entry point; raw DSH stays loopback-only and every sidecar route remains blocked until classified and implemented.
 
-The fixture retains `dsh.runtime-registration-inventory` and upstream-contract candidate `DSH-RUNTIME-REGISTRATION-INVENTORY` as a profile-drift signal. It is deferred for the rejected in-process architecture, not treated as an implicit allow.
+The historical `rc.2` fixture retains `dsh.runtime-registration-inventory` and upstream-contract candidate `DSH-RUNTIME-REGISTRATION-INVENTORY` as a profile-drift signal. The live `rc.1` dynamic capture closes the local discovery gap; an upstream contract would still be needed to make an in-process filtering seam supportable.
 
 ## Evidence Records
 
@@ -54,4 +66,5 @@ The fixture retains `dsh.runtime-registration-inventory` and upstream-contract c
 | Installed package inventory | The live DSH CLI, connection, and webserver packages are `0.1.1-rc.1`; the canonical fixture remains the prior `0.1.1-rc.2` test profile. | Read the installed package manifests and the profile manifest without recording configuration values. |
 | Source inspection | `dsh-client-connection` registers `/api/events.mux` and `/api/events.host` directly; `webServer` permits one upgrade handler per path, and the RPC interceptor applies only to HTTP dispatch. | Inspect the installed connection and webserver public source and declarations. |
 | Runtime carrier audit | The current no-credential runtime reached each HTTP carrier (`415` for missing JSON content type) and accepted both standard WS upgrades (`101`). The audit exits nonzero for any non-`401`/`403` result. | `DSH_RUNTIME_URL=http://127.0.0.1:3080 npm run probe:runtime` |
+| Disposable composed runtime | The observer captured 117 unique registrations: 106 HTTP, 10 WebSocket upgrades, and one RPC interceptor. The generated network probe denied all 117 at the adapter boundary. | `npm run capture:runtime --workspace @dsh-teams/probe` followed by `npm run probe:runtime-inventory --workspace @dsh-teams/probe` |
 | Read-only RPC probe | A valid no-credential `session.list` envelope returned `200`; its body was not retained. | POST a conforming `client-request` envelope to `/api/session.list`, discard the response body, and record only status and byte count. |
