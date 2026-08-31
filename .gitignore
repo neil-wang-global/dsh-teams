@@ -1,1 +1,5 @@
 node_modules/
+/.build/
+.worktrees/
+.claude/worktrees/
+.DS_Store
