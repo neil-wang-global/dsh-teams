@@ -42,6 +42,9 @@ async function requestStatus(url: URL): Promise<number> {
       response.once('end', () => resolve(response.statusCode ?? 0))
     })
     probe.once('error', reject)
+    probe.setTimeout(5_000, () => {
+      probe.destroy(new Error(`timed out requesting ${url.pathname}`))
+    })
     probe.end()
   })
 }

@@ -100,6 +100,39 @@ test('reports a runtime carrier that releases a response as not denied', async (
   }
 })
 
+test('fails a non-responding HTTP carrier within the probe timeout', async () => {
+  const server = createServer(() => {})
+  await new Promise<void>((resolve, reject) => {
+    server.once('error', reject)
+    server.listen({ host: '127.0.0.1', port: 0 }, () => {
+      server.off('error', reject)
+      resolve()
+    })
+  })
+  const address = server.address()
+  if (address === null || typeof address === 'string') {
+    throw new Error('test runtime did not bind a TCP port')
+  }
+
+  try {
+    const outcome = await Promise.race([
+      probeRuntimeCarriers(
+        `http://127.0.0.1:${address.port}`,
+        [CORE_DSH_CARRIERS[0]],
+      ).then(
+        () => 'resolved',
+        (error: unknown) => error instanceof Error ? error.message : String(error),
+      ),
+      new Promise<string>((resolve) => setTimeout(() => resolve('still pending'), 5_500)),
+    ])
+
+    assert.match(outcome, /timed out requesting \/api\/session\.list/)
+  } finally {
+    server.closeAllConnections()
+    await new Promise<void>((resolve) => server.close(() => resolve()))
+  }
+})
+
 test('reports a standard WebSocket upgrade as not denied', async () => {
   let hasWebSocketKey = false
   const server = createServer((_request, response) => response.writeHead(404).end())
