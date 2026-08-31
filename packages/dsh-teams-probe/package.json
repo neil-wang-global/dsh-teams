@@ -5,6 +5,7 @@
   "type": "module",
   "license": "MPL-2.0",
   "scripts": {
-    "test": "node --test test/*.test.ts"
+    "test": "node --test test/*.test.ts",
+    "probe:runtime": "node src/runtime-carrier-cli.ts"
   }
 }

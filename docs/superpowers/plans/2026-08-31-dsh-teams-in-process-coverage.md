@@ -1,5 +1,7 @@
 # DSH Teams In-Process Coverage Implementation Plan
 
+> **Status:** Superseded by `2026-08-31-dsh-runtime-carrier-correction.md`. The earlier disposable fixture omitted the DSH core `POST /api/:method`, `/api/events.mux`, and `/api/events.host` carriers, so its `sidecar-required` decision is not valid evidence for the current profile.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Produce reproducible, fail-closed evidence that determines whether the current DSH profile can be protected by one in-process adapter.

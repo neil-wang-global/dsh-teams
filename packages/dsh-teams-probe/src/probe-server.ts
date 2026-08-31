@@ -36,6 +36,7 @@ export interface ProbeUpgradeResponse {
 const REGISTERED_HTTP_ROUTES: readonly ProbeRoute[] = [
   { kind: 'http', id: 'GET /api/session.export' },
   { kind: 'http', id: 'HEAD /api/session.export' },
+  { kind: 'http', id: 'POST /api/:method' },
   { kind: 'http', id: 'POST /sidebar/api/:method' },
   { kind: 'http', id: 'GET /sidebar/file' },
   { kind: 'http', id: 'GET /sidebar/html' },
@@ -43,6 +44,8 @@ const REGISTERED_HTTP_ROUTES: readonly ProbeRoute[] = [
 ]
 
 const REGISTERED_WEBSOCKET_ROUTES: readonly ProbeRoute[] = [
+  { kind: 'websocket', id: '/api/events.mux' },
+  { kind: 'websocket', id: '/api/events.host' },
   { kind: 'websocket', id: '/sidebar/ws/terminal' },
   { kind: 'websocket', id: '/sidebar/ws/agent-terminals' },
 ]
@@ -50,7 +53,9 @@ const REGISTERED_WEBSOCKET_ROUTES: readonly ProbeRoute[] = [
 function matchesHttpRoute(route: ProbeRoute, method: string, path: string): boolean {
   const [routeMethod, routePath] = route.id.split(' ', 2)
   return routeMethod === method
-    && (routePath === path || (routePath === '/sidebar/api/:method' && path.startsWith('/sidebar/api/')))
+    && (routePath === path
+      || (routePath === '/api/:method' && path.startsWith('/api/'))
+      || (routePath === '/sidebar/api/:method' && path.startsWith('/sidebar/api/')))
 }
 
 function routeForHttp(routes: readonly ProbeRoute[], method: string, path: string): ProbeRoute | undefined {

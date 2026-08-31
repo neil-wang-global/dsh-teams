@@ -80,6 +80,21 @@ test('coverage assessor rejects bypassed and duplicate route transcripts', () =>
   ])
 })
 
+test('coverage assessor keeps a proven carrier pending registration inventory', () => {
+  const snapshot = normalizeSnapshot(createProfile([
+    { kind: 'http', id: 'POST /api/:method', status: 'blocked', classification: 'blocked' },
+  ]))
+
+  const report = assessInProcessCoverage(snapshot, [{
+    kind: 'http',
+    id: 'POST /api/:method',
+    observation: 'intercepted-denied',
+  }], { runtimeRegistrationInventory: 'incomplete' })
+
+  assert.equal(report.decision, 'runtime-inventory-required')
+  assert.deepEqual(report.failures, [])
+})
+
 test('Fiber adapter denies a registered HTTP route before a response is released', async () => {
   const adapter = new FiberProbeAdapter()
   const server = await DisposableProbeServer.start({ adapter })
@@ -180,7 +195,7 @@ test('incremental frame is withheld after the adapter is revoked', async () => {
   }
 })
 
-test('disposable profile selects sidecar-required for unresolved DSH carriers', async () => {
+test('disposable profile keeps runtime registration inventory pending after known carriers', async () => {
   const snapshot = normalizeSnapshot(await readCurrentProfile())
   const adapter = new FiberProbeAdapter()
   const server = await DisposableProbeServer.start({ adapter })
@@ -192,25 +207,22 @@ test('disposable profile selects sidecar-required for unresolved DSH carriers', 
       transcripts: adapter.transcripts.bind(adapter),
     })
 
-    assert.equal(report.decision, 'sidecar-required')
+    assert.equal(report.decision, 'runtime-inventory-required')
     assert.deepEqual(report.interceptedDenied, [
       'http GET /api/session.export',
       'http GET /sidebar/bundle',
       'http GET /sidebar/file',
       'http GET /sidebar/html',
       'http HEAD /api/session.export',
+      'http POST /api/:method',
       'http POST /sidebar/api/:method',
+      'websocket /api/events.host',
+      'websocket /api/events.mux',
       'websocket /sidebar/ws/agent-terminals',
       'websocket /sidebar/ws/terminal',
     ])
     assert.deepEqual(report.missing, [])
-    assert.deepEqual(report.unresolved, [
-      'rpc session.list',
-      'rpc session.search',
-      'rpc workspace.create',
-      'websocket unresolved DSH stream carrier baseline',
-      'websocket unresolved DSH stream carrier incremental',
-    ])
+    assert.deepEqual(report.unresolved, [])
   } finally {
     await server.close()
   }

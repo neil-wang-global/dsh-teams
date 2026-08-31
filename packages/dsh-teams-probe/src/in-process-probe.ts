@@ -14,13 +14,17 @@ export interface ProbeTranscript {
 }
 
 export interface InProcessCoverageReport {
-  decision: 'in-process-covered' | 'sidecar-required'
+  decision: 'in-process-covered' | 'runtime-inventory-required' | 'sidecar-required'
   interceptedDenied: string[]
   bypassed: string[]
   duplicates: string[]
   missing: string[]
   unresolved: string[]
   failures: string[]
+}
+
+export interface InProcessCoverageOptions {
+  runtimeRegistrationInventory?: 'complete' | 'incomplete'
 }
 
 export interface InProcessProbeTransport {
@@ -40,6 +44,7 @@ function sort(values: string[]): string[] {
 export function assessInProcessCoverage(
   snapshot: DshSurfaceSnapshot,
   transcripts: readonly ProbeTranscript[],
+  options: InProcessCoverageOptions = {},
 ): InProcessCoverageReport {
   const expected = new Map(snapshot.surfaces.map((surface) => [surfaceKey(surface), surface]))
   const bySurface = new Map<string, ProbeTranscript[]>()
@@ -118,7 +123,11 @@ export function assessInProcessCoverage(
   sort(failures)
 
   return {
-    decision: failures.length === 0 ? 'in-process-covered' : 'sidecar-required',
+    decision: failures.length > 0
+      ? 'sidecar-required'
+      : options.runtimeRegistrationInventory === 'incomplete'
+        ? 'runtime-inventory-required'
+        : 'in-process-covered',
     interceptedDenied,
     bypassed,
     duplicates,
@@ -162,5 +171,7 @@ export async function runInProcessCoverageProbe(
       assertDenied(surface, response.status)
     }
   }
-  return assessInProcessCoverage(snapshot, transport.transcripts())
+  return assessInProcessCoverage(snapshot, transport.transcripts(), {
+    runtimeRegistrationInventory: 'incomplete',
+  })
 }
