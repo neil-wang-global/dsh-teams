@@ -38,8 +38,9 @@ function runtimeUrl(baseUrl: string, path: string): URL {
 async function requestStatus(url: URL): Promise<number> {
   return await new Promise<number>((resolve, reject) => {
     const probe = request(url, { method: 'POST' }, (response) => {
-      response.resume()
-      response.once('end', () => resolve(response.statusCode ?? 0))
+      const status = response.statusCode ?? 0
+      resolve(status)
+      response.destroy()
     })
     probe.once('error', reject)
     probe.setTimeout(5_000, () => {

@@ -100,6 +100,47 @@ test('reports a runtime carrier that releases a response as not denied', async (
   }
 })
 
+test('reports an HTTP carrier after headers from a streaming response', async () => {
+  const server = createServer((_request, response) => {
+    response.writeHead(200)
+    const timer = setInterval(() => response.write('x'), 25)
+    response.once('close', () => clearInterval(timer))
+  })
+  await new Promise<void>((resolve, reject) => {
+    server.once('error', reject)
+    server.listen({ host: '127.0.0.1', port: 0 }, () => {
+      server.off('error', reject)
+      resolve()
+    })
+  })
+  const address = server.address()
+  if (address === null || typeof address === 'string') {
+    throw new Error('test runtime did not bind a TCP port')
+  }
+
+  try {
+    const result = await Promise.race([
+      probeRuntimeCarriers(
+        `http://127.0.0.1:${address.port}`,
+        [CORE_DSH_CARRIERS[0]],
+      ),
+      new Promise<never>((_resolve, reject) => setTimeout(
+        () => reject(new Error('streaming response did not yield a carrier status')),
+        250,
+      )),
+    ])
+
+    assert.deepEqual(result, [{
+      ...CORE_DSH_CARRIERS[0],
+      status: 200,
+      exposure: 'not-denied',
+    }])
+  } finally {
+    server.closeAllConnections()
+    await new Promise<void>((resolve) => server.close(() => resolve()))
+  }
+})
+
 test('fails a non-responding HTTP carrier within the probe timeout', async () => {
   const server = createServer(() => {})
   await new Promise<void>((resolve, reject) => {
