@@ -2,6 +2,8 @@
 
 > **Live-access update:** The `401`/`403` denial result recorded by the original runtime probe is no longer current. The probe now reports every observed status, fails closed when a carrier is reachable without denial, and uses a standards-compliant WebSocket handshake. The current loopback runtime reports HTTP `415` without JSON and WebSocket `101`; a valid read-only `session.list` RPC returned `200` with its body discarded.
 
+> **Status:** Superseded for the data-plane decision by the `sidecar-required` evidence in `docs/compatibility/in-process-coverage.md`. The live DSH `0.1.1-rc.1` core event upgrades have no supported in-process filtering seam, so completing an in-process dynamic-registration capture cannot make the selected data plane safe.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Correct the DSH 0.1.1-rc.2 carrier inventory and prevent fixture-only evidence from selecting a data-plane architecture.
