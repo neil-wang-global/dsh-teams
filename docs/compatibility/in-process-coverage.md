@@ -55,6 +55,14 @@ The live no-credential runtime audit produced these reachable results:
 
 The runner selects `runtime-inventory-required` because the core carriers are known but the complete runtime registration inventory has not yet been captured. The current runtime does not supply a default identity boundary: its non-denial results are a security finding, not in-process coverage evidence. The documented `ctx.connection.rpc.intercept('/api', ...)` seam can cover matching HTTP RPC methods, while the inspected public extension interfaces expose no equivalent interceptor for the core event WebSockets, which are exclusively registered by DSH. The dedicated bypass probes still show that a duplicate raw `GET /sidebar/file` registration and an unregistered raw route return `200` without adapter denial. Each produces a `bypassed` transcript and would select `sidecar-required` for an actual composed runtime. A connection established while the adapter is allowed receives no incremental frame after the adapter is revoked; the rejected frame is recorded as `websocket /sidebar/ws/terminal incremental` with `intercepted-denied`.
 
+## Runtime Research Notes (2026-09-01)
+
+- The supplied runtime at `http://localhost:3080` is a loopback listener launched by `dsh web`. It was used only as a read-only audit target; the running process was not modified or instrumented.
+- Its observed `415`, `101`, and body-discarded `200` responses are carrier-reachability evidence only. They show that the raw DSH listener has no default identity boundary, but cannot reveal registrations that occurred before the process started.
+- The installed DSH profile exposes `@deepseek-ai/dsh-host-webserver` with public `register(route)` and `registerUpgrade(route)` methods. Those are the supported metadata-capture boundary for a disposable composed runtime; an auditor must be installed before plugins register.
+- A post-start audit cannot reconstruct the complete plugin route or RPC inventory. Gate A therefore remains blocked on a disposable startup-time capture, followed by a deny-probe for every captured entry.
+- The two core event WebSocket upgrades remain a distinct proof obligation. Until a supported filtering seam is demonstrated for them, their reachability prevents an `in-process-covered` decision.
+
 ## Required Follow-Up
 
 Instrument a disposable composed DSH runtime before plugins register. Capture every `webServer.register`, `webServer.registerUpgrade`, and generic RPC registration, add the resulting routes to the inventory, and deny-probe every captured carrier. Prove a supported filtering seam for the two existing event upgrades, or select a sidecar for them. Select `in-process-covered` only if every resulting route is intercepted with no bypass; select `sidecar-required` for any bypass or unfilterable core event route. Keep the raw DSH listener loopback-only and every uncaptured route blocked until then.
