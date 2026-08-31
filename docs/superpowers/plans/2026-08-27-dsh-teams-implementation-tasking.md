@@ -61,8 +61,8 @@ All tasks begin as `not-started`. Move a task to `in-progress` only after its de
 | Task | Status | Dependency | Gate or release effect |
 |---|---|---|---|
 | DT-0-01 | complete | None | Enables manifest validation. |
-| DT-0-02 | in-progress | DT-0-01 | Core carriers are recorded; composed runtime registration inventory remains. |
-| DT-0-03 | in-progress | DT-0-02 | Awaits a real composed-runtime deny probe. |
+| DT-0-02 | complete | DT-0-01 | Surface inventory and composed-runtime registration research are recorded. |
+| DT-0-03 | complete | DT-0-02 | Fail-closed interception result and deny-probe evidence are recorded. |
 | DT-0-04 | not-started | DT-0-03 | Records Gate A architecture decision. |
 | DT-1-01 | not-started | Gate A | Establishes core configuration contract. |
 | DT-1-02 | not-started | DT-1-01 | Establishes secure persistence. |
@@ -114,7 +114,7 @@ All tasks begin as `not-started`. Move a task to `in-progress` only after its de
 - [x] Implement profile scanning from an explicit `DSH_PROFILE_DIR`; never hard-code a user's profile path in source.
 - [x] Record the observed profile bundle list, including the fact that `dsh-auth-gate` may be installed but is not used by `dsh-teams`.
 - [x] Commit report and fixtures with `docs(compatibility): inventory DSH authorization surface`.
-- [ ] Capture every route, upgrade, and generic RPC registration from a disposable composed runtime; update the report and fixture from that trace.
+- [x] Capture every route, upgrade, and generic RPC registration from a disposable composed runtime; update the report and fixture from that trace.
 
 ### DT-0-03: Prove or reject in-process interception coverage
 
@@ -128,7 +128,7 @@ All tasks begin as `not-started`. Move a task to `in-progress` only after its de
 - [x] Write failing probe tests for a route that bypasses an adapter, a duplicated raw route, and an incremental WS frame that is emitted after authorization changes.
 - [x] Implement a temporary Fiber-scoped probe adapter that records only route/method/frame metadata and can deny test traffic.
 - [x] Execute against a disposable DSH profile and store redacted transcripts in `docs/compatibility/in-process-coverage.md`.
-- [ ] Capture and deny-probe the complete composed runtime registration inventory before choosing an adapter architecture.
+- [x] Capture and deny-probe the complete composed runtime registration inventory before choosing an adapter architecture.
 
 ### DT-0-04: Prove execution isolation and record the architecture decision
 
