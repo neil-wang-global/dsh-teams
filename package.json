@@ -11,9 +11,10 @@
     "prepare": "lefthook install --force",
     "test": "npm run test --workspaces --if-present",
     "test:probe": "npm test --workspace @dsh-teams/probe",
+    "test:core": "npm test --workspace @dsh-teams/core",
     "probe:runtime": "npm run probe:runtime --workspace @dsh-teams/probe",
     "lint:plan": "tsc --noEmit -p packages/dsh-teams-probe/tsconfig.json",
-    "check": "npm run lint:plan && npm run test:probe"
+    "check": "npm run lint:plan && npm run test:probe && npm run test:core"
   },
   "repository": {
     "type": "git",
