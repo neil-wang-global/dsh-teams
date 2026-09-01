@@ -70,7 +70,13 @@ function readCanonicalUrl(environment, mode) {
     fail('invalid-canonical-url', 'DSH_TEAMS_CANONICAL_URL must be an absolute URL')
   }
 
-  if (parsed.username || parsed.password || parsed.search || parsed.hash || parsed.pathname !== '/') {
+  if (
+    parsed.username
+    || parsed.password
+    || parsed.search
+    || parsed.hash
+    || parsed.href !== `${parsed.origin}/`
+  ) {
     fail('invalid-canonical-url', 'DSH_TEAMS_CANONICAL_URL must be an origin URL without credentials')
   }
   if (mode === 'production' && parsed.protocol !== 'https:') {

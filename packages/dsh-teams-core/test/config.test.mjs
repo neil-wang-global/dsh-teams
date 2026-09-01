@@ -88,6 +88,15 @@ test('rejects a production canonical URL that is not HTTPS', () => {
   )
 })
 
+test('rejects canonical URLs with empty query or fragment markers', () => {
+  for (const canonicalUrl of ['https://teams.example.test?', 'https://teams.example.test#']) {
+    assertConfigurationError(
+      () => loadConfig(productionEnvironment({ DSH_TEAMS_CANONICAL_URL: canonicalUrl })),
+      'invalid-canonical-url',
+    )
+  }
+})
+
 test('rejects a non-loopback raw DSH bind address', () => {
   assertConfigurationError(
     () => loadConfig(developmentEnvironment({ DSH_TEAMS_DSH_BIND: '0.0.0.0' })),
