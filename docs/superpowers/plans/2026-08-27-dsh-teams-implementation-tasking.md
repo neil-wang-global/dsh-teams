@@ -63,7 +63,7 @@ All tasks begin as `not-started`. Move a task to `in-progress` only after its de
 | DT-0-01 | complete | None | Enables manifest validation. |
 | DT-0-02 | complete | DT-0-01 | Disposable composed runtime capture records every discovered HTTP, WebSocket, and generic RPC registration; the redacted inventory is versioned. |
 | DT-0-03 | complete | DT-0-02 | Every captured registration has an adapter-denial transcript; raw core carrier probes and source inspection select `sidecar-required` because required event upgrades are unfilterable in process. |
-| DT-0-04 | not-started | DT-0-03 | Selects the independent execution-plane boundary before Gate A can pass. |
+| DT-0-04 | complete | DT-0-03 | Selects the independent execution-plane boundary before Gate A can pass. |
 | DT-1-01 | not-started | Gate A | Establishes core configuration contract. |
 | DT-1-02 | not-started | DT-1-01 | Establishes secure persistence. |
 | DT-1-03 | not-started | DT-1-02 | Establishes independent password identity. |
@@ -134,16 +134,16 @@ All tasks begin as `not-started`. Move a task to `in-progress` only after its de
 
 **Depends on:** DT-0-03
 **Source:** Design sections 4.3, 4.4, 15.7, 18
-**Files:** Create `packages/dsh-teams-probe/src/execution-probe.mjs`, `packages/dsh-teams-probe/test/execution-probe.test.mjs`, `docs/compatibility/architecture-decision.md`, `docs/compatibility/upstream-seam-template.md`.
+**Files:** Create `packages/dsh-teams-probe/src/execution-probe.ts`, `packages/dsh-teams-probe/test/execution-probe.test.ts`, `docs/compatibility/architecture-decision.md`, `docs/compatibility/upstream-seam-template.md`.
 **Outcome:** A signed-off architecture decision records a data-plane adapter (`in-process` or `sidecar`) and an execution-plane boundary (`in-process-isolated`, `isolated-worker`, or `blocked`) from proven Agent/Tool/filesystem/credential boundaries. The decisions may compose `sidecar` with `isolated-worker`.
 **Completion check:** Test principals cannot read another workspace's files, use another workspace's credentials, invoke unapproved Host tools, or escape the selected worker boundary. Every required route and stream has a non-bypassable selected adapter. The decision document links every negative result to a fallback or upstream request.
 **Failure disposition:** Select a sidecar data-plane adapter when in-process coverage fails; select isolated workers when execution isolation requires them; otherwise mark non-admin execution blocked and create an upstream request using the template.
 
-- [ ] Write failing isolation tests for cross-workspace file reads, secret reads, Host service use, subagent/fork inheritance, and custom Remote resource creation.
-- [ ] Run the same tests against the candidate in-process preset and a per-workspace worker fixture.
-- [ ] Write the architecture decision with DSH version, evidence links, independent data-plane and execution-plane decisions, allowed composition, rejected alternatives, residual risks, and owner of the next review.
-- [ ] Treat Gate A as passed only when an auditor can rerun all probes and reach the same decision.
-- [ ] Commit with `docs(architecture): record DSH Teams capability decision`.
+- [x] Write failing isolation tests for cross-workspace file reads, secret reads, Host service use, subagent/fork inheritance, and custom Remote resource creation.
+- [x] Run the same tests against the candidate in-process preset and a per-workspace worker fixture.
+- [x] Write the architecture decision with DSH version, evidence links, independent data-plane and execution-plane decisions, allowed composition, rejected alternatives, residual risks, and owner of the next review.
+- [x] Treat Gate A as passed only when an auditor can rerun all probes and reach the same decision.
+- [x] Commit with `docs(architecture): record DSH Teams capability decision`.
 
 ## Phase 1: Identity, SQLite, and Baseline Operations
 
