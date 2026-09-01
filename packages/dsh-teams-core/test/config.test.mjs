@@ -70,13 +70,14 @@ test('loads an immutable production configuration with safe secret references', 
   assert.equal(Object.isFrozen(config), true)
 })
 
-test('allows an insecure development Cookie only when explicitly enabled', () => {
+test('uses a non-prefixed Cookie name for explicitly insecure development Cookies', () => {
   const config = loadConfig(developmentEnvironment({
     DSH_TEAMS_COOKIE_SECURE: 'false',
     DSH_TEAMS_ALLOW_INSECURE_COOKIE: 'true',
   }))
 
   assert.equal(config.cookie.secure, false)
+  assert.equal(config.cookie.name, 'dsh-teams')
   assert.equal(config.canonicalUrl.href, 'http://localhost:3081/')
 })
 

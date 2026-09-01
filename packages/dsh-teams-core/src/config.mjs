@@ -111,7 +111,7 @@ function readCookie(environment, mode) {
     fail('insecure-cookie-not-explicit', 'insecure Cookies require DSH_TEAMS_ALLOW_INSECURE_COOKIE=true')
   }
   return Object.freeze({
-    name: '__Host-dsh-teams',
+    name: secure ? '__Host-dsh-teams' : 'dsh-teams',
     secure,
     httpOnly: true,
     sameSite: 'lax',

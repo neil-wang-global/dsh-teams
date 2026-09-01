@@ -18,7 +18,7 @@ The canonical URL has no credentials, query, fragment, or path component. Produc
 
 ## Session Cookie
 
-`DSH_TEAMS_COOKIE_SECURE` defaults to `true`. The resulting session Cookie is always named `__Host-dsh-teams`, `HttpOnly`, `SameSite=Lax`, and `Path=/`; it does not accept a Domain setting.
+`DSH_TEAMS_COOKIE_SECURE` defaults to `true`. Secure session Cookies are named `__Host-dsh-teams`; the explicit insecure development mode uses `dsh-teams` because browsers require the `Secure` attribute for the `__Host-` prefix. Both Cookies are `HttpOnly`, `SameSite=Lax`, and `Path=/`; neither accepts a Domain setting.
 
 Production requires `DSH_TEAMS_COOKIE_SECURE=true`. Development can set it to `false` only when `DSH_TEAMS_ALLOW_INSECURE_COOKIE=true` is also set explicitly. This opt-in is for local development only and must not be copied to deployed configuration.
 
