@@ -1,0 +1,10 @@
+{
+  "name": "@dsh-teams/core",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "license": "MPL-2.0",
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  }
+}
