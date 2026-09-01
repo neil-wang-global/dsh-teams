@@ -143,7 +143,7 @@ All tasks begin as `not-started`. Move a task to `in-progress` only after its de
 - [x] Run the same tests against the candidate in-process preset and a per-workspace worker fixture.
 - [x] Write the architecture decision with DSH version, evidence links, independent data-plane and execution-plane decisions, allowed composition, rejected alternatives, residual risks, and owner of the next review.
 - [x] Treat Gate A as passed only when an auditor can rerun all probes and reach the same decision.
-- [ ] Commit with `docs(architecture): record DSH Teams capability decision`.
+- [x] Commit with `docs(architecture): record DSH Teams capability decision`.
 
 ## Phase 1: Identity, SQLite, and Baseline Operations
 

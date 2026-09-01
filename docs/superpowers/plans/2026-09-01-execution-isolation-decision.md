@@ -125,7 +125,7 @@ Run: `npm run check`
 
 Expected: TypeScript checks and all probe tests pass.
 
-- [ ] **Step 5: Commit the completed task**
+- [x] **Step 5: Commit the completed task**
 
 ```bash
 git add packages/dsh-teams-probe docs/compatibility docs/superpowers/plans
