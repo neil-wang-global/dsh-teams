@@ -9,3 +9,11 @@ export class ConfigurationError extends Error {
     this.code = code
   }
 }
+
+export class StorageError extends Error {
+  constructor(code, message) {
+    super(message)
+    this.name = 'StorageError'
+    this.code = code
+  }
+}
