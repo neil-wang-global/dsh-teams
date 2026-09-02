@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
-import { chmod, lstat, mkdir, mkdtemp, readFile, realpath, rm, symlink, writeFile } from 'node:fs/promises'
+import { syncBuiltinESMExports } from 'node:module'
+import fsPromises, { chmod, lstat, mkdir, mkdtemp, readFile, realpath, rm, symlink, writeFile } from 'node:fs/promises'
 import { randomBytes } from 'node:crypto'
 import os from 'node:os'
 import path from 'node:path'
@@ -196,6 +197,40 @@ test('rejects altered encrypted backups without creating a restore destination',
   await assert.rejects(
     () => restoreEncryptedBackup({ source: backupPath, destination: restoredPath, key }),
     (error) => error instanceof StorageError && error.code === 'storage-backup-authentication',
+  )
+  await assert.rejects(() => lstat(restoredPath), { code: 'ENOENT' })
+})
+
+test('removes a restore destination when post-rename artifact validation fails', async (t) => {
+  const { root, databasePath, cleanup } = await createDatabasePath()
+  const source = await openDatabase({ databasePath })
+  const backupPath = path.join(source.backupDirectory, 'post-rename-failure.dshb')
+  const restoredPath = path.join(root, 'post-rename-failure', 'teams', 'teams.sqlite3')
+  const key = randomBytes(32)
+
+  await createEncryptedBackup(source, { destination: backupPath, key })
+  source.close()
+  await mkdir(path.dirname(restoredPath), { recursive: true, mode: 0o700 })
+
+  const originalChmod = fsPromises.chmod
+  fsPromises.chmod = async (target, mode) => {
+    if (target === restoredPath) {
+      const error = new Error('forced post-rename chmod failure')
+      error.code = 'EIO'
+      throw error
+    }
+    return originalChmod(target, mode)
+  }
+  syncBuiltinESMExports()
+  t.after(() => {
+    fsPromises.chmod = originalChmod
+    syncBuiltinESMExports()
+  })
+  t.after(cleanup)
+
+  await assert.rejects(
+    () => restoreEncryptedBackup({ source: backupPath, destination: restoredPath, key }),
+    (error) => error instanceof StorageError && error.code === 'storage-restore-failed',
   )
   await assert.rejects(() => lstat(restoredPath), { code: 'ENOENT' })
 })

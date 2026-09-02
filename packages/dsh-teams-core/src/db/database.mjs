@@ -186,6 +186,7 @@ export async function createEncryptedBackup(opened, { destination, key } = {}) {
 export async function restoreEncryptedBackup({ source, destination, key, expectedUid } = {}) {
   assertBackupKey(key)
   let temporaryPath
+  let destinationCreated = false
   try {
     const sourceIsPresent = await assertSecureFileIfPresent(source, { expectedUid })
     if (!sourceIsPresent) {
@@ -209,10 +210,18 @@ export async function restoreEncryptedBackup({ source, destination, key, expecte
     await writeNewPrivateFile(temporaryPath, plaintext, expectedUid)
     await verifyRestorableSqlite(temporaryPath)
     await rename(temporaryPath, destination)
+    destinationCreated = true
     await secureNewFile(destination)
     await assertDatabaseArtifacts(destination, { expectedUid })
     return Object.freeze({ destination })
   } catch (error) {
+    if (destinationCreated) {
+      try {
+        await rm(destination, { force: true })
+      } catch {
+        throw new StorageError('storage-restore-cleanup', 'unable to remove failed restore destination')
+      }
+    }
     if (error instanceof StorageError) throw error
     throw new StorageError('storage-restore-failed', 'unable to restore encrypted backup')
   } finally {
