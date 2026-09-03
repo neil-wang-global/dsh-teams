@@ -3,5 +3,6 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 import { initialMigration } from './001-initial.mjs'
+import { identityMigration } from './002-identity.mjs'
 
-export const migrations = Object.freeze([initialMigration])
+export const migrations = Object.freeze([initialMigration, identityMigration])

@@ -17,3 +17,12 @@ export class StorageError extends Error {
     this.code = code
   }
 }
+
+export class IdentityError extends Error {
+  constructor(code, message, status = 400) {
+    super(message)
+    this.name = 'IdentityError'
+    this.code = code
+    this.status = status
+  }
+}

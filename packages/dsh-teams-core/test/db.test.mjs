@@ -43,7 +43,7 @@ test('opens SQLite from the configured database path', async (t) => {
   assert.equal(database.connection.prepare('PRAGMA foreign_keys').get().foreign_keys, 1)
   assert.deepEqual(
     database.connection.prepare('SELECT version FROM schema_migrations ORDER BY version').all().map((row) => row.version),
-    ['001-initial'],
+    ['001-initial', '002-identity'],
   )
   assert.equal((await lstat(config.database.path)).mode & 0o777, 0o600)
 })
@@ -122,7 +122,7 @@ test('applies the initial migration once and enforces its foreign keys', async (
 
   assert.deepEqual(
     database.connection.prepare('SELECT version FROM schema_migrations ORDER BY version').all().map((row) => row.version),
-    ['001-initial'],
+    ['001-initial', '002-identity'],
   )
   assert.throws(
     () => database.connection
@@ -135,7 +135,7 @@ test('applies the initial migration once and enforces its foreign keys', async (
   database = await openDatabase({ path: databasePath })
   assert.deepEqual(
     database.connection.prepare('SELECT version FROM schema_migrations ORDER BY version').all().map((row) => row.version),
-    ['001-initial'],
+    ['001-initial', '002-identity'],
   )
 })
 
