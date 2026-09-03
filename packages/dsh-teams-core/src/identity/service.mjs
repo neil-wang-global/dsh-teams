@@ -67,6 +67,16 @@ function readUser(connection, userId) {
   return user
 }
 
+function readPasswordHash(connection, userId) {
+  return connection.prepare('SELECT password_hash FROM password_credentials WHERE user_id = ?').get(userId)?.password_hash
+}
+
+function requireUnchangedPasswordHash(connection, userId, passwordHash) {
+  if (readPasswordHash(connection, userId) !== passwordHash) {
+    fail('authentication-invalid', 'authentication failed', 401)
+  }
+}
+
 function requireActiveAdmin(connection, userId) {
   const user = readUser(connection, userId)
   if (user.status !== 'active' || user.system_role !== 'admin') {
@@ -212,6 +222,7 @@ export class IdentityService {
     return transaction(this.connection, () => {
       const user = readUser(this.connection, candidate.id)
       if (user.status !== 'active') fail('authentication-invalid', 'authentication failed', 401)
+      requireUnchangedPasswordHash(this.connection, user.id, candidate.password_hash)
       this.connection.prepare('DELETE FROM login_rate_limits WHERE key_digest = ?').run(rateLimitKey)
       const record = createSessionRecord({
         userId: user.id,
@@ -268,13 +279,14 @@ export class IdentityService {
 
   async changePassword({ userId, currentPassword, newPassword } = {}) {
     const user = readUser(this.connection, userId)
-    const credential = this.connection.prepare('SELECT password_hash FROM password_credentials WHERE user_id = ?').get(user.id)
-    if (!await verifyPassword(currentPassword, credential?.password_hash ?? DUMMY_PASSWORD_HASH)) {
+    const passwordHashBeforeVerification = readPasswordHash(this.connection, user.id)
+    if (!await verifyPassword(currentPassword, passwordHashBeforeVerification ?? DUMMY_PASSWORD_HASH)) {
       fail('authentication-invalid', 'authentication failed', 401)
     }
     const passwordHash = await hashPassword(newPassword)
     const now = timestamp(this.now)
     return transaction(this.connection, () => {
+      requireUnchangedPasswordHash(this.connection, user.id, passwordHashBeforeVerification)
       this.connection.prepare('UPDATE password_credentials SET password_hash = ?, updated_at = ? WHERE user_id = ?').run(passwordHash, now, user.id)
       this.connection.prepare('UPDATE users SET must_change_password = 0, updated_at = ? WHERE id = ?').run(now, user.id)
       changeAuthorizationVersion(this.connection, user.id, now)

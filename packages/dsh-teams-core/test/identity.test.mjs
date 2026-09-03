@@ -180,6 +180,48 @@ test('password reset and account lifecycle changes revoke stale sessions while p
   )
 })
 
+test('password reset rejects a concurrent login using the replaced password', async (t) => {
+  const { directory, databasePath } = await createDatabasePath()
+  t.after(() => rm(directory, { force: true, recursive: true }))
+  const opened = await openDatabase({ path: databasePath })
+  t.after(() => opened.close())
+  const service = new IdentityService(opened)
+  const founder = await service.bootstrapFounder({ email: 'founder@example.test', password: 'old password' })
+  const reset = await service.beginPasswordReset({ email: founder.email })
+
+  const [resetResult, oldPasswordLogin] = await Promise.allSettled([
+    service.resetPassword({ token: reset.token, newPassword: 'new password' }),
+    service.authenticate({ email: founder.email, password: 'old password' }),
+  ])
+
+  assert.equal(resetResult.status, 'fulfilled')
+  assert.equal(oldPasswordLogin.status, 'rejected')
+  assert.equal(oldPasswordLogin.reason.code, 'authentication-invalid')
+})
+
+test('password reset rejects a concurrent password change using the replaced password', async (t) => {
+  const { directory, databasePath } = await createDatabasePath()
+  t.after(() => rm(directory, { force: true, recursive: true }))
+  const opened = await openDatabase({ path: databasePath })
+  t.after(() => opened.close())
+  const service = new IdentityService(opened)
+  const founder = await service.bootstrapFounder({ email: 'founder@example.test', password: 'old password' })
+  const reset = await service.beginPasswordReset({ email: founder.email })
+
+  const [resetResult, oldPasswordChange] = await Promise.allSettled([
+    service.resetPassword({ token: reset.token, newPassword: 'reset password' }),
+    service.changePassword({
+      userId: founder.id,
+      currentPassword: 'old password',
+      newPassword: 'stale replacement password',
+    }),
+  ])
+
+  assert.equal(resetResult.status, 'fulfilled')
+  assert.equal(oldPasswordChange.status, 'rejected')
+  assert.equal(oldPasswordChange.reason.code, 'authentication-invalid')
+})
+
 test('failed login rate limits survive service reconstruction without revealing account state', async (t) => {
   const { directory, databasePath } = await createDatabasePath()
   t.after(() => rm(directory, { force: true, recursive: true }))
