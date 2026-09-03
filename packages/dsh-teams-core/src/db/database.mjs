@@ -229,7 +229,7 @@ export async function restoreEncryptedBackup({ source, destination, key, expecte
   }
 }
 
-export async function openDatabase({ databasePath, busyTimeoutMs, expectedUid } = {}) {
+export async function openDatabase({ path: databasePath, busyTimeoutMs, expectedUid } = {}) {
   const timeout = readBusyTimeout(busyTimeoutMs)
   let storage
   let connection
@@ -253,7 +253,7 @@ export async function openDatabase({ databasePath, busyTimeoutMs, expectedUid } 
 
   return Object.freeze({
     connection,
-    databasePath,
+    path: databasePath,
     backupDirectory: storage.backupDirectory,
     expectedUid,
     close: () => connection.close(),

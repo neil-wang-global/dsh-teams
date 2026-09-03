@@ -14,6 +14,7 @@ import {
   openDatabase,
   restoreEncryptedBackup,
 } from '../src/db/database.mjs'
+import { loadConfig } from '../src/config.mjs'
 
 async function createDatabasePath() {
   const root = await mkdtemp(path.join(await realpath(os.tmpdir()), 'dsh-teams-db-'))
@@ -24,9 +25,32 @@ async function createDatabasePath() {
   }
 }
 
+test('opens SQLite from the configured database path', async (t) => {
+  const root = await mkdtemp(path.join(await realpath(os.tmpdir()), 'dsh-teams-configured-db-'))
+  const config = loadConfig({
+    DSH_TEAMS_MODE: 'development',
+    DSH_TEAMS_CANONICAL_URL: 'http://localhost:3081',
+    DSH_HOME: root,
+    DSH_TEAMS_DSH_BIND: '127.0.0.1',
+    DSH_TEAMS_DSH_PORT: '3080',
+  })
+  const database = await openDatabase(config.database)
+  t.after(() => database.close())
+  t.after(() => rm(root, { force: true, recursive: true }))
+
+  assert.equal(database.path, config.database.path)
+  assert.equal(database.connection.prepare('PRAGMA journal_mode').get().journal_mode, 'wal')
+  assert.equal(database.connection.prepare('PRAGMA foreign_keys').get().foreign_keys, 1)
+  assert.deepEqual(
+    database.connection.prepare('SELECT version FROM schema_migrations ORDER BY version').all().map((row) => row.version),
+    ['001-initial'],
+  )
+  assert.equal((await lstat(config.database.path)).mode & 0o777, 0o600)
+})
+
 test('opens a secured SQLite database with WAL and foreign keys enabled', async (t) => {
   const { databasePath, cleanup } = await createDatabasePath()
-  const database = await openDatabase({ databasePath, busyTimeoutMs: 25 })
+  const database = await openDatabase({ path: databasePath, busyTimeoutMs: 25 })
   t.after(() => database.close())
   t.after(cleanup)
 
@@ -45,7 +69,7 @@ test('rejects an existing teams directory with group-readable permissions', asyn
   await chmod(teamsDirectory, 0o750)
 
   await assert.rejects(
-    () => openDatabase({ databasePath }),
+    () => openDatabase({ path: databasePath }),
     (error) => error instanceof StorageError && error.code === 'storage-directory-mode',
   )
 })
@@ -59,7 +83,7 @@ test('rejects a teams directory symbolic link before opening SQLite', async (t) 
   await symlink(linkTarget, teamsDirectory)
 
   await assert.rejects(
-    () => openDatabase({ databasePath }),
+    () => openDatabase({ path: databasePath }),
     (error) => error instanceof StorageError && error.code === 'storage-directory-realpath',
   )
 })
@@ -73,7 +97,7 @@ test('rejects a symbolic-link path segment before creating the teams directory',
   await symlink(actualHome, linkedHome)
 
   await assert.rejects(
-    () => openDatabase({ databasePath: path.join(linkedHome, 'teams', 'teams.sqlite3') }),
+    () => openDatabase({ path: path.join(linkedHome, 'teams', 'teams.sqlite3') }),
     (error) => error instanceof StorageError && error.code === 'storage-directory-realpath',
   )
   await assert.rejects(() => lstat(path.join(actualHome, 'teams')), { code: 'ENOENT' })
@@ -85,14 +109,14 @@ test('rejects storage not owned by the expected runtime user', async (t) => {
   const { databasePath, cleanup } = await createDatabasePath()
   t.after(cleanup)
   await assert.rejects(
-    () => openDatabase({ databasePath, expectedUid: process.getuid() + 1 }),
+    () => openDatabase({ path: databasePath, expectedUid: process.getuid() + 1 }),
     (error) => error instanceof StorageError && error.code === 'storage-directory-owner',
   )
 })
 
 test('applies the initial migration once and enforces its foreign keys', async (t) => {
   const { databasePath, cleanup } = await createDatabasePath()
-  let database = await openDatabase({ databasePath })
+  let database = await openDatabase({ path: databasePath })
   t.after(() => database.close())
   t.after(cleanup)
 
@@ -108,7 +132,7 @@ test('applies the initial migration once and enforces its foreign keys', async (
   )
 
   database.close()
-  database = await openDatabase({ databasePath })
+  database = await openDatabase({ path: databasePath })
   assert.deepEqual(
     database.connection.prepare('SELECT version FROM schema_migrations ORDER BY version').all().map((row) => row.version),
     ['001-initial'],
@@ -138,8 +162,8 @@ test('rolls back a failing migration without recording its version', (t) => {
 
 test('bounds SQLite write contention by the configured busy timeout', async (t) => {
   const { databasePath, cleanup } = await createDatabasePath()
-  const first = await openDatabase({ databasePath, busyTimeoutMs: 25 })
-  const second = await openDatabase({ databasePath, busyTimeoutMs: 25 })
+  const first = await openDatabase({ path: databasePath, busyTimeoutMs: 25 })
+  const second = await openDatabase({ path: databasePath, busyTimeoutMs: 25 })
   t.after(() => first.close())
   t.after(() => second.close())
   t.after(cleanup)
@@ -159,7 +183,7 @@ test('bounds SQLite write contention by the configured busy timeout', async (t) 
 
 test('restores an authenticated encrypted backup without retaining a plaintext backup', async (t) => {
   const { databasePath, cleanup } = await createDatabasePath()
-  const database = await openDatabase({ databasePath })
+  const database = await openDatabase({ path: databasePath })
   t.after(() => database.close())
   const backupPath = path.join(database.backupDirectory, 'snapshot.dshb')
   const restoredPath = path.join(path.dirname(path.dirname(databasePath)), 'restored', 'teams', 'teams.sqlite3')
@@ -174,7 +198,7 @@ test('restores an authenticated encrypted backup without retaining a plaintext b
   assert.equal(encrypted.includes(Buffer.from('site_state')), false)
   await restoreEncryptedBackup({ source: backupPath, destination: restoredPath, key })
 
-  const restored = await openDatabase({ databasePath: restoredPath })
+  const restored = await openDatabase({ path: restoredPath })
   t.after(() => restored.close())
   t.after(cleanup)
   assert.equal(restored.connection.prepare('SELECT count(*) AS count FROM site_state').get().count, 1)
@@ -182,7 +206,7 @@ test('restores an authenticated encrypted backup without retaining a plaintext b
 
 test('rejects altered encrypted backups without creating a restore destination', async (t) => {
   const { databasePath, cleanup } = await createDatabasePath()
-  const database = await openDatabase({ databasePath })
+  const database = await openDatabase({ path: databasePath })
   t.after(() => database.close())
   t.after(cleanup)
   const backupPath = path.join(database.backupDirectory, 'altered.dshb')
@@ -203,7 +227,7 @@ test('rejects altered encrypted backups without creating a restore destination',
 
 test('removes a restore destination when post-rename artifact validation fails', async (t) => {
   const { root, databasePath, cleanup } = await createDatabasePath()
-  const source = await openDatabase({ databasePath })
+  const source = await openDatabase({ path: databasePath })
   const backupPath = path.join(source.backupDirectory, 'post-rename-failure.dshb')
   const restoredPath = path.join(root, 'post-rename-failure', 'teams', 'teams.sqlite3')
   const key = randomBytes(32)
@@ -237,7 +261,7 @@ test('removes a restore destination when post-rename artifact validation fails',
 
 test('requires a 32-byte backup key', async (t) => {
   const { databasePath, cleanup } = await createDatabasePath()
-  const database = await openDatabase({ databasePath })
+  const database = await openDatabase({ path: databasePath })
   t.after(() => database.close())
   t.after(cleanup)
 
