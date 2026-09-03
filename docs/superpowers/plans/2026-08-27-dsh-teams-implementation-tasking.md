@@ -65,7 +65,7 @@ All tasks begin as `not-started`. Move a task to `in-progress` only after its de
 | DT-0-03 | complete | DT-0-02 | Every captured registration has an adapter-denial transcript; raw core carrier probes and source inspection select `sidecar-required` because required event upgrades are unfilterable in process. |
 | DT-0-04 | complete | DT-0-03 | Selects the independent execution-plane boundary before Gate A can pass. |
 | DT-1-01 | complete | Gate A | Validates canonical URL, loopback DSH binding, derived SQLite path, secret references, SMTP settings, Cookies, and feature flags before startup. |
-| DT-1-02 | not-started | DT-1-01 | Establishes secure persistence. |
+| DT-1-02 | complete | DT-1-01 | Establishes secure persistence. |
 | DT-1-03 | not-started | DT-1-02 | Establishes independent password identity. |
 | DT-1-04 | not-started | DT-1-03 | Adds audit and mail delivery semantics. |
 | DT-2-01 | not-started | Gate A, DT-1-02 | Establishes policy and epochs on secure persistence. |

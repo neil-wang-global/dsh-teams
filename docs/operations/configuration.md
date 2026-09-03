@@ -48,4 +48,4 @@ Run the repository verification before deployment:
 npm run check
 ```
 
-At startup, reject any configuration error before opening a public listener, initializing persistence, issuing a session, or starting a worker. Report the error code to the operator and keep readiness unavailable until corrected. The later database foundation adds ownership, mode, realpath, symlink, WAL, and backup checks for the derived SQLite path.
+At startup, reject any configuration or persistence error before opening a public listener, issuing a session, or starting a worker. Report only the stable error code to the operator and keep readiness unavailable until corrected. The persistence foundation validates ownership, modes, realpaths, and symbolic links for the derived SQLite path; it also enables WAL, foreign keys, migration checks, and encrypted backup support.
