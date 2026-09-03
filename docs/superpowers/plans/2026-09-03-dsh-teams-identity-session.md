@@ -31,7 +31,7 @@
 - Consumes: `applyMigrations(connection)` from `src/db/database.mjs`.
 - Produces: `auth_sessions.auth_version`, `auth_sessions.restricted`, and `login_rate_limits` with no plaintext login key.
 
-- [ ] **Step 1: Write a migration assertion that expects the identity columns and table.**
+- [x] **Step 1: Write a migration assertion that expects the identity columns and table.**
 
 ```js
 const opened = await openDatabase({ path: databasePath })
@@ -42,11 +42,11 @@ assert.deepEqual(
 assert.equal(opened.connection.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'login_rate_limits'").get().name, 'login_rate_limits')
 ```
 
-- [ ] **Step 2: Run the focused test and confirm it fails because the columns and table are absent.**
+- [x] **Step 2: Run the focused test and confirm it fails because the columns and table are absent.**
 
 Run: `npm test --workspace @dsh-teams/core -- --test-name-pattern='identity storage contract'`
 
-- [ ] **Step 3: Add migration version `002-identity`.**
+- [x] **Step 3: Add migration version `002-identity`.**
 
 ```js
 connection.exec(`
@@ -62,7 +62,7 @@ connection.exec(`
 `)
 ```
 
-- [ ] **Step 4: Re-run the focused test and verify it passes.**
+- [x] **Step 4: Re-run the focused test and verify it passes.**
 
 Run: `npm test --workspace @dsh-teams/core -- --test-name-pattern='identity storage contract'`
 
@@ -76,7 +76,7 @@ Run: `npm test --workspace @dsh-teams/core -- --test-name-pattern='identity stor
 **Interfaces:**
 - Produces: `hashPassword(password)`, `verifyPassword(password, hash)`, `hashOpaqueValue(value)`, `createOpaqueToken()`, and `createSessionRecord({ userId, authVersion, restricted, expiresAt })`.
 
-- [ ] **Step 1: Write failing tests for a verifiable versioned password hash and a random opaque session token whose digest differs from its token.**
+- [x] **Step 1: Write failing tests for a verifiable versioned password hash and a random opaque session token whose digest differs from its token.**
 
 ```js
 const passwordHash = await hashPassword('correct horse battery staple')
@@ -86,18 +86,18 @@ const session = createSessionRecord({ userId: 'user-1', authVersion: 0, restrict
 assert.notEqual(session.token, session.tokenDigest.toString('base64url'))
 ```
 
-- [ ] **Step 2: Run the focused tests and confirm imports fail because the modules do not exist.**
+- [x] **Step 2: Run the focused tests and confirm imports fail because the modules do not exist.**
 
 Run: `npm test --workspace @dsh-teams/core -- --test-name-pattern='password primitives|opaque session primitive'`
 
-- [ ] **Step 3: Implement scrypt hashes, SHA-256 digests, and 32-byte base64url tokens.**
+- [x] **Step 3: Implement scrypt hashes, SHA-256 digests, and 32-byte base64url tokens.**
 
 ```js
 const digest = createHash('sha256').update(value).digest()
 const token = randomBytes(32).toString('base64url')
 ```
 
-- [ ] **Step 4: Re-run the focused primitive tests and verify they pass.**
+- [x] **Step 4: Re-run the focused primitive tests and verify they pass.**
 
 Run: `npm test --workspace @dsh-teams/core -- --test-name-pattern='password primitives|opaque session primitive'`
 
@@ -112,7 +112,7 @@ Run: `npm test --workspace @dsh-teams/core -- --test-name-pattern='password prim
 - Consumes: an opened database plus password/session primitives.
 - Produces: `IdentityService` with `bootstrapFounder`, `createTemporaryUser`, `authenticate`, `assertSession`, `rotateSession`, `changePassword`, `beginPasswordReset`, `resetPassword`, `setUserStatus`, and `setSystemRole`.
 
-- [ ] **Step 1: Add failing bootstrap and founder-invariant tests.**
+- [x] **Step 1: Add failing bootstrap and founder-invariant tests.**
 
 ```js
 const service = new IdentityService(opened, { now: () => now })
@@ -121,11 +121,11 @@ await assert.rejects(() => service.bootstrapFounder({ email: 'other@example.test
 await assert.rejects(() => service.setUserStatus({ actorUserId: founder.id, userId: founder.id, status: 'disabled' }), { code: 'founder-protected' })
 ```
 
-- [ ] **Step 2: Run the focused tests and confirm they fail because `IdentityService` is absent.**
+- [x] **Step 2: Run the focused tests and confirm they fail because `IdentityService` is absent.**
 
 Run: `npm test --workspace @dsh-teams/core -- --test-name-pattern='bootstrap|founder invariant'`
 
-- [ ] **Step 3: Implement input normalization, active-admin checks, founder bootstrap, temporary-user creation, and founder protection in explicit immediate transactions.**
+- [x] **Step 3: Implement input normalization, active-admin checks, founder bootstrap, temporary-user creation, and founder protection in explicit immediate transactions.**
 
 ```js
 connection.exec('BEGIN IMMEDIATE')
@@ -138,7 +138,7 @@ try {
 }
 ```
 
-- [ ] **Step 4: Add failing tests for restricted sessions, digest-only session storage, rotation, password changes/resets, lifecycle revocation, and durable rate limiting.**
+- [x] **Step 4: Add failing tests for restricted sessions, digest-only session storage, rotation, password changes/resets, lifecycle revocation, and durable rate limiting.**
 
 ```js
 const login = await service.authenticate({ email: 'member@example.test', password })
@@ -146,18 +146,18 @@ assert.equal(opened.connection.prepare('SELECT token_digest FROM auth_sessions W
 await assert.rejects(() => service.assertSession(login.session.token, { requireUnrestricted: true }), { status: 403 })
 ```
 
-- [ ] **Step 5: Run each focused test group and confirm every new assertion fails for the missing behavior.**
+- [x] **Step 5: Run each focused test group and confirm every new assertion fails for the missing behavior.**
 
 Run: `npm test --workspace @dsh-teams/core -- --test-name-pattern='session|password reset|rate limit|lifecycle revocation'`
 
-- [ ] **Step 6: Implement the minimal transactionally consistent session, password, reset, revocation, and rate-limit behavior.**
+- [x] **Step 6: Implement the minimal transactionally consistent session, password, reset, revocation, and rate-limit behavior.**
 
 ```js
 connection.prepare('UPDATE users SET auth_version = auth_version + 1, updated_at = ? WHERE id = ?').run(now, userId)
 connection.prepare('UPDATE auth_sessions SET revoked_at = ?, updated_at = ? WHERE user_id = ? AND revoked_at IS NULL').run(now, now, userId)
 ```
 
-- [ ] **Step 7: Re-run the identity suite and verify all focused tests pass.**
+- [x] **Step 7: Re-run the identity suite and verify all focused tests pass.**
 
 Run: `npm test --workspace @dsh-teams/core -- --test-name-pattern='identity|session|password|rate limit|bootstrap|founder'`
 
@@ -167,15 +167,15 @@ Run: `npm test --workspace @dsh-teams/core -- --test-name-pattern='identity|sess
 - Modify: `docs/superpowers/plans/2026-08-27-dsh-teams-implementation-tasking.md`
 - Test: `packages/dsh-teams-core/test/identity.test.mjs`
 
-- [ ] **Step 1: Run the full core suite.**
+- [x] **Step 1: Run the full core suite.**
 
 Run: `npm test --workspace @dsh-teams/core`
 
-- [ ] **Step 2: Run repository verification.**
+- [x] **Step 2: Run repository verification.**
 
 Run: `npm run check`
 
-- [ ] **Step 3: Mark DT-1-03 complete only after both commands pass, inspect the final diff, and create a focused conventional commit.**
+- [x] **Step 3: Mark DT-1-03 complete only after both commands pass, inspect the final diff, and create a focused conventional commit.**
 
 ```sh
 git diff --check
